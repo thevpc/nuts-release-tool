@@ -1,0 +1,6 @@
+#!/bin/bash
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+NUTS_BASE=$SCRIPT_DIR/../nuts
+V=0.8.5.0
+echo $SCRIPT_DIR
+java -jar -Dnuts.args="-ZyS -w=dev" $SCRIPT_DIR/nuts-release-tool/target/nuts-release-tool-$V.jar --root=$NUTS_BASE
