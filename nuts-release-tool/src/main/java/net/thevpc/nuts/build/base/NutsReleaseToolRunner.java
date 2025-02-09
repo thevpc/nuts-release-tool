@@ -7,6 +7,7 @@ import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.cmdline.NCmdLineConfigurable;
 import net.thevpc.nuts.spi.NScopeType;
 import net.thevpc.nuts.time.NChronometer;
+import net.thevpc.nuts.util.NMsg;
 
 public class NutsReleaseToolRunner {
 
@@ -45,12 +46,12 @@ public class NutsReleaseToolRunner {
 
     public void run(NCmdLine args) {
         NChronometer chrono = NChronometer.startNow();
-        NOut.println("Process started");
+        NOut.println("##nuts-release-tool## started");
         configure(args);
         for (AbstractRunner runner : runners) {
             runner.run();
         }
-        NOut.println("Process finished in " + chrono.stop());
+        NOut.println(NMsg.ofC("##nuts-release-tool## finished in %s",chrono.stop()));
     }
 
 
