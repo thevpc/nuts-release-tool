@@ -51,7 +51,7 @@ public class NutsReleaseToolRunner {
         for (AbstractRunner runner : runners) {
             runner.run();
         }
-        NOut.println(NMsg.ofC("##nuts-release-tool## finished in %s",chrono.stop()));
+        NOut.println(NMsg.ofC("%s finished in %s",NMsg.ofStyledPrimary1("nuts-release-tool"),chrono.stop()));
     }
 
 
