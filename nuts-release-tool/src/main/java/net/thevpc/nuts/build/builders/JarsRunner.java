@@ -122,7 +122,7 @@ public class JarsRunner extends AbstractRunner {
         if(!localJarStable.isRegularFile()){
             throw new NIllegalArgumentException(NMsg.ofC("unable to find nuts stable jar at : %s", localJarStable));
         }
-//        NPath.of("https://thevpc.net/maven/" + Mvn.jar(NWorkspace.of().getAppId().builder().setVersion(context().nutsStableAppVersion).build()))
+//        NPath.of("https://maven.thevpc.net/" + Mvn.jar(NWorkspace.of().getAppId().builder().setVersion(context().nutsStableAppVersion).build()))
 //                        .copyTo(localJarStable);
 
         localJarStable.copyTo(context().websiteProjectFolder.resolve("src/resources/download").resolve("nuts-stable.jar"));

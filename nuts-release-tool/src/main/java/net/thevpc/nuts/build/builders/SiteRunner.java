@@ -70,7 +70,7 @@ public class SiteRunner extends AbstractRunner {
 //        String latestJarLocation = "https://raw.githubusercontent.com/thevpc/nuts-preview/master/net/thevpc/nuts/nuts/" + latestApiVersion + "/nuts-" + latestApiVersion + ".jar";
 //        String stableJarLocation = "https://repo.maven.apache.org/maven2/net/thevpc/nuts/nuts/" + stableApiVersion + "/nuts-" + stableApiVersion + ".jar";
 
-        String latestJarLocation = "https://thevpc.net/maven/" + Mvn.jar(NWorkspace.of().getAppId());
+        String latestJarLocation = "https://maven.thevpc.net/" + Mvn.jar(NWorkspace.of().getAppId());
 
         vars.putAll(context().vars);
         vars.put("buildTime", new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date()));
@@ -83,7 +83,7 @@ public class SiteRunner extends AbstractRunner {
             NId stableAppId = NWorkspace.of().getAppId().builder().setVersion(context().nutsStableAppVersion).build();
             NId stableRuntimeId = NWorkspace.of().getRuntimeId().builder().setVersion(context().nutsStableRuntimeVersion).build();
 
-            String stableJarLocation = "https://thevpc.net/maven/" + Mvn.jar(stableAppId);
+            String stableJarLocation = "https://maven.thevpc.net/" + Mvn.jar(stableAppId);
 
             vars.put("stableApiId", stableApiId.toString());
             vars.put("stableApiVersion", stableApiId.getVersion().toString());
