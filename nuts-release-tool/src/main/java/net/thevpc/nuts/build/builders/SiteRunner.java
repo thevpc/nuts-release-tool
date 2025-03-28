@@ -11,10 +11,10 @@ import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 
 import net.thevpc.nuts.io.NPath;
-import net.thevpc.nuts.lib.doc.context.NDocContext;
-import net.thevpc.nuts.lib.doc.context.ProjectNDocContext;
+import net.thevpc.nsite.context.NDocContext;
+import net.thevpc.nsite.context.ProjectNDocContext;
 import net.thevpc.nuts.util.NMaps;
-import net.thevpc.nuts.lib.doc.NDocProjectConfig;
+import net.thevpc.nsite.NDocProjectConfig;
 import net.thevpc.nuts.util.NAssert;
 import net.thevpc.nuts.util.NMsg;
 
