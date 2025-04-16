@@ -362,7 +362,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
                 NArg nArg = line.peek().orNull();
                 if (nArg.isLong()) {
                     long pid = line.next().get().asLong().get();
-                    String clz = line.next().get().asString().get();
+                    String clz = line.next().get().getImage();
                     JpsResult r = new JpsResult(pid, clz, line.toStringArray());
                     if ("org.apache.catalina.startup.Bootstrap".equals(r.getClassName())) {
                         r.setType("Tomcat");
