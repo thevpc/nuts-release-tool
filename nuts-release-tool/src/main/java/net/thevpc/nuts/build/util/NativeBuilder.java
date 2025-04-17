@@ -582,10 +582,10 @@ public class NativeBuilder {
         NDescriptor nDescriptor = NDescriptorParser.of().setDescriptorStyle(NDescriptorStyle.MAVEN).parse(getProjectFolder().resolve("pom.xml")).get();
         this.projectId = nDescriptor.getId();
         if (preferredId != null && preferredId.getVersion().isBlank()) {
-            preferredId=preferredId.builder().setVersion(projectId.getVersion()).builder();
+            preferredId=preferredId.builder().setVersion(projectId.getVersion()).build();
         }
         if (preferredId != null && NBlankable.isBlank(preferredId.getGroupId())) {
-            preferredId=preferredId.builder().setGroupId(projectId.getGroupId()).builder();
+            preferredId=preferredId.builder().setGroupId(projectId.getGroupId()).build();
         }
         if (preferredId != null && !NBlankable.isBlank(preferredId.getArtifactId())) {
             setAppName(preferredId.getArtifactId());
