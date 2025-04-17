@@ -26,7 +26,7 @@ public class NReleaseUtils {
         if (!desc.isPresent()) {
             return false;
         }
-        if (!desc.get().getId().getShortName().equals("net.thevpc.nuts.builders:nuts-builder")) {
+        if (!desc.get().getId().getArtifactId().equals("nuts-community-builder")) {
             return false;
         }
         if (!currentDir.resolve("documentation/website").isDirectory()) {
