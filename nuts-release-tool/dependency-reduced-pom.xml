@@ -222,13 +222,13 @@
     </profile>
   </profiles>
   <properties>
-    <nuts.gui>true</nuts.gui>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
     <nuts.categories>/Settings/PackageManager/Nuts
             /Utilities</nuts.categories>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <nuts.genericName>NutsBuildTool</nuts.genericName>
+    <nuts.gui>true</nuts.gui>
     <github.global.server>github</github.global.server>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <nuts.genericName>NutsBuildTool</nuts.genericName>
   </properties>
 </project>
