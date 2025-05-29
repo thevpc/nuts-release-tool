@@ -14,7 +14,6 @@ public class NutsReleaseToolMain implements NApplication {
     @Override
     public void run() {
         NSession session = NSession.of();
-        NPath currentDir = NPath.ofUserDirectory();
         //always yes!!
         session.copy().setConfirm(NConfirmationMode.YES)
                 .runWith(() -> {
