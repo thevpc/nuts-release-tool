@@ -35,37 +35,37 @@ public class JarsRunner extends AbstractRunner {
         NArg c = cmdLine.peek().orNull();
         switch (c.key()) {
             case "--update-version": {
-                cmdLine.withNextFlag((v, a) -> context().updateVersion = v);
+                cmdLine.withNextFlag((v) -> context().updateVersion = v.booleanValue());
                 return true;
             }
             case "--keep-stamp": {
-                cmdLine.withNextFlag((v, a) -> context().keepStamp = v);
+                cmdLine.withNextFlag((v) -> context().keepStamp = v.booleanValue());
                 return true;
             }
             case "--production-mode": {
-                cmdLine.withNextFlag((v, a) -> context().productionMode = v);
+                cmdLine.withNextFlag((v) -> context().productionMode = v.booleanValue());
                 return true;
             }
 
             case "--stable-api-version": {
-                cmdLine.withNextEntry((v, a) -> context().nutsStableApiVersion = v);
+                cmdLine.withNextEntry((v) -> context().nutsStableApiVersion = v.stringValue());
                 return true;
             }
             case "--stable-app-version": {
-                cmdLine.withNextEntry((v, a) -> context().nutsStableAppVersion = v);
+                cmdLine.withNextEntry((v) -> context().nutsStableAppVersion = v.stringValue());
                 return true;
             }
             case "--stable-runtime-version": {
-                cmdLine.withNextEntry((v, a) -> context().nutsStableRuntimeVersion = v);
+                cmdLine.withNextEntry((v) -> context().nutsStableRuntimeVersion = v.stringValue());
                 return true;
             }
 
             case "--remote-ssh-user": {
-                cmdLine.withNextEntry((v, a) -> context().remoteTheVpcSshUser = v);
+                cmdLine.withNextEntry((v) -> context().remoteTheVpcSshUser = v.stringValue());
                 return true;
             }
             case "--remote-ssh-host": {
-                cmdLine.withNextEntry((v, a) -> context().remoteTheVpcSshUser = v);
+                cmdLine.withNextEntry((v) -> context().remoteTheVpcSshUser = v.stringValue());
                 return true;
             }
 //            case "build-jars": {

@@ -29,11 +29,11 @@ public class ReposRunner extends AbstractRunner {
         NArg c = cmdLine.peek().orNull();
         switch (c.key()) {
             case "build-repo-nuts-preview": {
-                cmdLine.withNextFlag((v, a) -> repoPreview = v);
+                cmdLine.withNextFlag((v) -> repoPreview = v.booleanValue());
                 return true;
             }
             case "build-repo-nuts-public": {
-                cmdLine.withNextFlag((v, a) -> repoPublic = v);
+                cmdLine.withNextFlag((v) -> repoPublic = v.booleanValue());
                 return true;
             }
         }

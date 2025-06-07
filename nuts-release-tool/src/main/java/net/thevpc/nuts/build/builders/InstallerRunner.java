@@ -43,18 +43,18 @@ public class InstallerRunner extends AbstractRunner {
         NArg c = cmdLine.peek().orNull();
         switch (c.key()) {
             case "--native": {
-                cmdLine.withNextFlag((v, a) -> buildNative = v);
+                cmdLine.withNextFlag((v) -> buildNative = v.booleanValue());
                 return true;
             }
             case "build-installer": {
-                cmdLine.withNextFlag((v, a) -> {
-                    buildInstaller = v;
+                cmdLine.withNextFlag((v) -> {
+                    buildInstaller = v.booleanValue();
                 });
                 return true;
             }
             case "build-bin": {
-                cmdLine.withNextFlag((v, a) -> {
-                    buildBin = v;
+                cmdLine.withNextFlag((v) -> {
+                    buildBin = v.booleanValue();
                 });
                 return true;
             }

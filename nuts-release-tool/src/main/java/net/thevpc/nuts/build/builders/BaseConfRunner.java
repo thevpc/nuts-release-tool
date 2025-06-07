@@ -25,14 +25,14 @@ public class BaseConfRunner extends AbstractRunner {
         NArg c = cmdLine.peek().orNull();
         switch (c.key()) {
             case "--root": {
-                cmdLine.withNextEntry((v, a) -> {
+                cmdLine.withNextEntry((v) -> {
                     //already processed
                     //context().nutsRootFolder = NPath.of(v).toAbsolute().normalize();
                 });
                 return true;
             }
             case "--conf": {
-                cmdLine.withNextEntry((v, a) -> {
+                cmdLine.withNextEntry((v) -> {
                             //already processed
                             //context().confFile = (NPath.of(v).isDirectory() ? NPath.of(v).resolve(NUTS_RELEASE_CONF) : NPath.of(v)).toAbsolute().normalize()
                         }
@@ -40,22 +40,22 @@ public class BaseConfRunner extends AbstractRunner {
                 return true;
             }
             case "--debug": {
-                cmdLine.withNextFlag((v, a)
+                cmdLine.withNextFlag((v)
                         -> context().nutsDebugArg = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
                 );
                 return true;
             }
             case "--trace": {
-                cmdLine.withNextFlag((v, a) -> context().trace = v);
+                cmdLine.withNextFlag((v) -> context().trace = v.booleanValue());
                 return true;
             }
             case "--verbose": {
-                cmdLine.withNextFlag((v, a) -> context().verbose = v);
+                cmdLine.withNextFlag((v) -> context().verbose = v.booleanValue());
                 return true;
             }
             // actions
             case "publish": {
-                cmdLine.withNextFlag((v, a) -> context().publish = v);
+                cmdLine.withNextFlag((v) -> context().publish = v.booleanValue());
                 return true;
             }
         }
@@ -68,8 +68,8 @@ public class BaseConfRunner extends AbstractRunner {
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
-        cmdLine.lookupNextEntry((a, c) -> {
-            NPath newRoot = NPath.of(a).toAbsolute().normalize();
+        cmdLine.lookupNextEntry((a) -> {
+            NPath newRoot = NPath.of(a.stringValue()).toAbsolute().normalize();
             NReleaseUtils.ensureNutsRepoFolder(newRoot);
             context().nutsRootFolder = newRoot;
         }, "--root");
@@ -78,8 +78,8 @@ public class BaseConfRunner extends AbstractRunner {
             NReleaseUtils.ensureNutsRepoFolder(newRoot);
             context().nutsRootFolder = newRoot;
         }
-        cmdLine.lookupNextEntry((a, c) -> {
-            NPath conf = NPath.of(a).toAbsolute().normalize();
+        cmdLine.lookupNextEntry((a) -> {
+            NPath conf = NPath.of(a.stringValue()).toAbsolute().normalize();
             context().confFile = conf;
         }, "--conf");
 
