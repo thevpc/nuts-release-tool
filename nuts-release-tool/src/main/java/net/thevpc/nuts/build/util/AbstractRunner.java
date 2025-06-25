@@ -361,7 +361,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
                 NCmdLine line = NCmdLine.parseDefault(row).orNull();
                 NArg nArg = line.peek().orNull();
                 if (nArg.isLong()) {
-                    long pid = line.next().get().asLong().get();
+                    long pid = line.next().get().intValue();
                     String clz = line.next().get().getImage();
                     JpsResult r = new JpsResult(pid, clz, line.toStringArray());
                     if ("org.apache.catalina.startup.Bootstrap".equals(r.getClassName())) {
