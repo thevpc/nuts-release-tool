@@ -15,7 +15,7 @@ public class ConfReader {
         NRef<StringBuilder> lastValue = NRef.of(new StringBuilder());
         NRef<Integer> lineNumber = NRef.of(0);
         List<Map.Entry<String,String>> result=new ArrayList<>();
-        conf.getLines().forEach(line -> {
+        conf.lines().forEach(line -> {
             lineNumber.set(lineNumber.get() + 1);
             String toProcessLine = null;
             if (wrap.get()) {
