@@ -5,13 +5,14 @@ import net.thevpc.nuts.build.base.NutsReleaseToolRunner;
 import net.thevpc.nuts.build.builders.*;
 import net.thevpc.nuts.io.NPath;
 
-public class NutsReleaseToolMain implements NApplication {
+@NApp.Info
+public class NutsReleaseToolMain  {
 
     public static void main(String[] args) {
         NApp.builder(args).run();
     }
 
-    @Override
+    @NApp.Main
     public void run() {
         NSession session = NSession.of();
         //always yes!!
