@@ -8,7 +8,7 @@ import net.thevpc.nuts.io.NPath;
 public class NutsReleaseToolMain implements NApplication {
 
     public static void main(String[] args) {
-        new NutsReleaseToolMain().main(NMainArgs.of(args));
+        NApp.builder(args).run();
     }
 
     @Override
