@@ -25,14 +25,14 @@ public class BaseConfRunner extends AbstractRunner {
         NArg c = cmdLine.peek().orNull();
         switch (c.key()) {
             case "--root": {
-                cmdLine.selector().withNextEntry((v) -> {
+                cmdLine.matcher().matchEntry((v) -> {
                     //already processed
                     //context().nutsRootFolder = NPath.of(v).toAbsolute().normalize();
                 }).require();
                 return true;
             }
             case "--conf": {
-                cmdLine.selector().withNextEntry((v) -> {
+                cmdLine.matcher().matchEntry((v) -> {
                             //already processed
                             //context().confFile = (NPath.of(v).isDirectory() ? NPath.of(v).resolve(NUTS_RELEASE_CONF) : NPath.of(v)).toAbsolute().normalize()
                         }
@@ -40,19 +40,19 @@ public class BaseConfRunner extends AbstractRunner {
                 return true;
             }
             case "--debug": {
-                return cmdLine.selector().withNextFlag((v)
+                return cmdLine.matcher().matchFlag((v)
                         -> context().nutsDebugArg = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
                 ).anyMatch();
             }
             case "--trace": {
-                return cmdLine.selector().withNextFlag((v) -> context().trace = v.booleanValue()).anyMatch();
+                return cmdLine.matcher().matchFlag((v) -> context().trace = v.booleanValue()).anyMatch();
             }
             case "--verbose": {
-                return cmdLine.selector().withNextFlag((v) -> context().verbose = v.booleanValue()).anyMatch();
+                return cmdLine.matcher().matchFlag((v) -> context().verbose = v.booleanValue()).anyMatch();
             }
             // actions
             case "publish": {
-                return cmdLine.selector().withNextFlag((v) -> context().publish = v.booleanValue()).anyMatch();
+                return cmdLine.matcher().matchFlag((v) -> context().publish = v.booleanValue()).anyMatch();
             }
         }
         return false;
@@ -66,13 +66,13 @@ public class BaseConfRunner extends AbstractRunner {
     public void configureBeforeOptions(NCmdLine cmdLine) {
         cmdLine=cmdLine.copy();
         while (cmdLine.hasNext()) {
-            if(cmdLine.selector()
-                    .with("--root").nextEntry(a->{
+            if(cmdLine.matcher()
+                    .with("--root").matchEntry(a->{
                         NPath newRoot = NPath.of(a.stringValue()).toAbsolute().normalize();
                         NReleaseUtils.ensureNutsRepoFolder(newRoot);
                         context().nutsRootFolder = newRoot;
                     })
-                    .with("--conf").nextEntry(a->{
+                    .with("--conf").matchEntry(a->{
                         NPath conf = NPath.of(a.stringValue()).toAbsolute().normalize();
                         context().confFile = conf;
                     })

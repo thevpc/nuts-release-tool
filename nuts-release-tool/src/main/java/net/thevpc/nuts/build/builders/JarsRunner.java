@@ -35,30 +35,30 @@ public class JarsRunner extends AbstractRunner {
         NArg c = cmdLine.peek().orNull();
         switch (c.key()) {
             case "--update-version": {
-                return cmdLine.selector().withNextFlag((v) -> context().updateVersion = v.booleanValue()).anyMatch();
+                return cmdLine.matcher().matchFlag((v) -> context().updateVersion = v.booleanValue()).anyMatch();
             }
             case "--keep-stamp": {
-                return cmdLine.selector().withNextFlag((v) -> context().keepStamp = v.booleanValue()).anyMatch();
+                return cmdLine.matcher().matchFlag((v) -> context().keepStamp = v.booleanValue()).anyMatch();
             }
             case "--production-mode": {
-                return cmdLine.selector().withNextFlag((v) -> context().productionMode = v.booleanValue()).anyMatch();
+                return cmdLine.matcher().matchFlag((v) -> context().productionMode = v.booleanValue()).anyMatch();
             }
 
             case "--stable-api-version": {
-                return cmdLine.selector().withNextEntry((v) -> context().nutsStableApiVersion = v.stringValue()).anyMatch();
+                return cmdLine.matcher().matchEntry((v) -> context().nutsStableApiVersion = v.stringValue()).anyMatch();
             }
             case "--stable-app-version": {
-                return cmdLine.selector().withNextEntry((v) -> context().nutsStableAppVersion = v.stringValue()).anyMatch();
+                return cmdLine.matcher().matchEntry((v) -> context().nutsStableAppVersion = v.stringValue()).anyMatch();
             }
             case "--stable-runtime-version": {
-                return cmdLine.selector().withNextEntry((v) -> context().nutsStableRuntimeVersion = v.stringValue()).anyMatch();
+                return cmdLine.matcher().matchEntry((v) -> context().nutsStableRuntimeVersion = v.stringValue()).anyMatch();
             }
 
             case "--remote-ssh-user": {
-                return cmdLine.selector().withNextEntry((v) -> context().remoteTheVpcSshUser = v.stringValue()).anyMatch();
+                return cmdLine.matcher().matchEntry((v) -> context().remoteTheVpcSshUser = v.stringValue()).anyMatch();
             }
             case "--remote-ssh-host": {
-                return cmdLine.selector().withNextEntry((v) -> context().remoteTheVpcSshUser = v.stringValue()).anyMatch();
+                return cmdLine.matcher().matchEntry((v) -> context().remoteTheVpcSshUser = v.stringValue()).anyMatch();
             }
 //            case "build-jars": {
 //                return cmdLine.selector().withNextFlag((v, a, s) -> buildJars = v);

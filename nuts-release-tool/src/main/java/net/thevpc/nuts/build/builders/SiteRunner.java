@@ -40,7 +40,7 @@ public class SiteRunner extends AbstractRunner {
         NArg c = cmdLine.peek().orNull();
         switch (c.key()) {
             case "site": {
-                cmdLine.withNextFlag((v) -> NUTS_FLAG_SITE = v.booleanValue());
+                cmdLine.matcher().matchFlag((v) -> NUTS_FLAG_SITE = v.booleanValue()).anyMatch();
                 return true;
             }
         }
