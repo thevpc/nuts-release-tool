@@ -3,7 +3,6 @@ package net.thevpc.nuts.build;
 import net.thevpc.nuts.*;
 import net.thevpc.nuts.build.base.NutsReleaseToolRunner;
 import net.thevpc.nuts.build.builders.*;
-import net.thevpc.nuts.io.NPath;
 
 @NApp.Info
 public class NutsReleaseToolMain  {
@@ -12,7 +11,7 @@ public class NutsReleaseToolMain  {
         NApp.builder(args).run();
     }
 
-    @NApp.Main
+    @NApp.Runner
     public void run() {
         NSession session = NSession.of();
         //always yes!!
