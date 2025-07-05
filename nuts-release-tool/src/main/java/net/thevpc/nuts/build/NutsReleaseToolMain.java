@@ -4,7 +4,7 @@ import net.thevpc.nuts.*;
 import net.thevpc.nuts.build.base.NutsReleaseToolRunner;
 import net.thevpc.nuts.build.builders.*;
 
-@NApp.Info
+@NApp.Definition
 public class NutsReleaseToolMain  {
 
     public static void main(String[] args) {
