@@ -64,9 +64,9 @@ public class BaseConfRunner extends AbstractRunner {
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
-        cmdLine=cmdLine.copy();
-        while (cmdLine.hasNext()) {
-            if(cmdLine.matcher()
+        NCmdLine cmdLine2=cmdLine.copy();
+        while (cmdLine2.hasNext()) {
+            if(cmdLine2.matcher()
                     .with("--root").matchEntry(a->{
                         NPath newRoot = NPath.of(a.stringValue()).toAbsolute().normalize();
                         NReleaseUtils.ensureNutsRepoFolder(newRoot);
@@ -77,7 +77,7 @@ public class BaseConfRunner extends AbstractRunner {
                         context().confFile = conf;
                     })
                     .noMatch()){
-                cmdLine.skip();
+                cmdLine2.skip();
             }
         }
         if (context().nutsRootFolder == null) {

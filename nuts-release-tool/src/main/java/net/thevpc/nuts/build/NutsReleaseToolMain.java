@@ -16,7 +16,7 @@ public class NutsReleaseToolMain  {
     public void run() {
         NSession session = NSession.of();
         //always yes!!
-        session.copy().setConfirm(NConfirmationMode.YES)
+        session.copy().yes()
                 .runWith(() -> {
                     NutsReleaseToolRunner nutsBuildRunner = new NutsReleaseToolRunner(
                             new BaseConfRunner(),
