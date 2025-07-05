@@ -4,14 +4,14 @@ import net.thevpc.nuts.*;
 import net.thevpc.nuts.build.base.NutsReleaseToolRunner;
 import net.thevpc.nuts.build.builders.*;
 
-@NApp.Definition
+@NAppDefinition
 public class NutsReleaseToolMain  {
 
     public static void main(String[] args) {
         NApp.builder(args).run();
     }
 
-    @NApp.Runner
+    @NAppRunner
     public void run() {
         NSession session = NSession.of();
         //always yes!!
