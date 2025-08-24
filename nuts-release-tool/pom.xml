@@ -26,7 +26,7 @@
     </scm>
     <dependencies>
         <dependency><groupId>net.thevpc.nuts</groupId><artifactId>nuts</artifactId><version>0.8.6</version></dependency>
-        <dependency><groupId>net.thevpc.nuts</groupId><artifactId>nuts-lib</artifactId><version>0.8.6.0</version></dependency>
+        <dependency><groupId>net.thevpc.nuts</groupId><artifactId>nuts</artifactId><version>0.8.6</version></dependency>
         <dependency><groupId>net.thevpc.nsite</groupId><artifactId>nsite-lib</artifactId><version>0.8.6.0</version></dependency>
         <dependency><groupId>org.yaml</groupId><artifactId>snakeyaml</artifactId><version>2.2</version></dependency>
     </dependencies>
