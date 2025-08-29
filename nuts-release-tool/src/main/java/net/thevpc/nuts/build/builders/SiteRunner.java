@@ -11,10 +11,10 @@ import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 
 import net.thevpc.nuts.io.NPath;
-import net.thevpc.nsite.context.NDocContext;
-import net.thevpc.nsite.context.ProjectNDocContext;
+import net.thevpc.nsite.context.NSiteContext;
+import net.thevpc.nsite.context.ProjectNSiteContext;
 import net.thevpc.nuts.util.NMaps;
-import net.thevpc.nsite.NDocProjectConfig;
+import net.thevpc.nsite.NSiteProjectConfig;
 import net.thevpc.nuts.util.NAssert;
 import net.thevpc.nuts.util.NMsg;
 
@@ -124,12 +124,12 @@ public class SiteRunner extends AbstractRunner {
 
     private void runGithubRepository() {
         echoC("**** %s %s (nuts)...", NMsg.ofStyledKeyword("ndoc"), NMsg.ofStyledSuccess("repository"));
-        NDocProjectConfig config = new NDocProjectConfig()
+        NSiteProjectConfig config = new NSiteProjectConfig()
                 .setContextName("nuts-release-tool/repository")
                 .setProjectPath(context().repositoryProjectFolder.toString())
                 .addSource(context().websiteProjectFolder.resolve("src/main/METADATA").toString())
                 .setTargetFolder(context().nutsRootFolder.toString());
-        NDocContext templateProject = new ProjectNDocContext();
+        NSiteContext templateProject = new ProjectNSiteContext();
         templateProject.setVars(prepareVars());
         NPath.of(Mvn.localMaven() + "/" + Mvn.jar(NWorkspace.of().getAppId()))
                 .copyTo(context().websiteProjectFolder.resolve("src/resources/download/nuts-preview.jar")
@@ -139,12 +139,12 @@ public class SiteRunner extends AbstractRunner {
 
     private void runGithubDocumentationWebsite() {
         echoC("**** %s %s (nuts)...", NMsg.ofStyledKeyword("ndoc"), NMsg.ofStyledSuccess("documentation"));
-        NDocProjectConfig config = new NDocProjectConfig()
+        NSiteProjectConfig config = new NSiteProjectConfig()
                 .setContextName("nuts-release-tool/documentation")
                 .setProjectPath(context().websiteProjectFolder.toString())
                 .setClean(true)
                 .setTargetFolder(context().nutsRootFolder.resolve("docs").toString());
-        NDocContext templateProject = new ProjectNDocContext();
+        NSiteContext templateProject = new ProjectNSiteContext();
         templateProject.setVars(prepareVars());
         NPath.of(Mvn.localMaven() + "/" + Mvn.jar(NWorkspace.of().getAppId()))
                 .copyTo(context().websiteProjectFolder.resolve("src/resources/nuts-preview.jar")
