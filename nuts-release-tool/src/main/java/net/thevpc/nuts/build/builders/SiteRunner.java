@@ -123,7 +123,7 @@ public class SiteRunner extends AbstractRunner {
     }
 
     private void runGithubRepository() {
-        echoC("**** %s %s (nuts)...", NMsg.ofStyledKeyword("ndoc"), NMsg.ofStyledSuccess("repository"));
+        echoC("**** %s %s (nuts)...", NMsg.ofStyledKeyword("nsite"), NMsg.ofStyledSuccess("repository"));
         NSiteProjectConfig config = new NSiteProjectConfig()
                 .setContextName("nuts-release-tool/repository")
                 .setProjectPath(context().repositoryProjectFolder.toString())
@@ -138,7 +138,7 @@ public class SiteRunner extends AbstractRunner {
     }
 
     private void runGithubDocumentationWebsite() {
-        echoC("**** %s %s (nuts)...", NMsg.ofStyledKeyword("ndoc"), NMsg.ofStyledSuccess("documentation"));
+        echoC("**** %s %s (nuts)...", NMsg.ofStyledKeyword("nsite"), NMsg.ofStyledSuccess("documentation"));
         NSiteProjectConfig config = new NSiteProjectConfig()
                 .setContextName("nuts-release-tool/documentation")
                 .setProjectPath(context().websiteProjectFolder.toString())
