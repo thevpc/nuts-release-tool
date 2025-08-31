@@ -132,7 +132,7 @@ public class SiteRunner extends AbstractRunner {
         NSiteContext templateProject = new ProjectNSiteContext();
         templateProject.setVars(prepareVars());
         NPath.of(Mvn.localMaven() + "/" + Mvn.jar(NWorkspace.of().getAppId()))
-                .copyTo(context().websiteProjectFolder.resolve("src/resources/download/nuts-preview.jar")
+                .copyTo(context().websiteProjectFolder.resolve("src/resources/download/nuts-standard.jar")
                 );
         templateProject.run(config);
     }
@@ -147,7 +147,7 @@ public class SiteRunner extends AbstractRunner {
         NSiteContext templateProject = new ProjectNSiteContext();
         templateProject.setVars(prepareVars());
         NPath.of(Mvn.localMaven() + "/" + Mvn.jar(NWorkspace.of().getAppId()))
-                .copyTo(context().websiteProjectFolder.resolve("src/resources/nuts-preview.jar")
+                .copyTo(context().websiteProjectFolder.resolve("src/resources/nuts-standard.jar")
                 );
         templateProject.run(config);
 

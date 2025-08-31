@@ -73,8 +73,8 @@ public class JarsRunner extends AbstractRunner {
 //        if (buildJars) {
             if (context().publish) {
                 runNutsPublishMaven();
-                runNutsPublishPreview();
-                runNutsPublishStable();
+                runNutsPublishStandard();
+                runNutsPublishLts();
             }
 //        }
     }
@@ -86,43 +86,43 @@ public class JarsRunner extends AbstractRunner {
         remoteCopyFolder(removeMvn().resolve(nutsFolder), remoteThevpcMavenPath().resolve(nutsFolder));
     }
 
-    private void runNutsPublishPreview() {
-        echoV("**** publish $nuts preview...", NMaps.of("nuts", NMsg.ofStyledKeyword("nuts")));
+    private void runNutsPublishStandard() {
+        echoV("**** publish $nuts standard...", NMaps.of("nuts", NMsg.ofStyledKeyword("nuts")));
         NPath latestJarPath = localMvn().resolve(Mvn.jar(NWorkspace.of().getAppId()));
         latestJarPath.copyTo(context().websiteProjectFolder.resolve("src/resources/download").resolve(latestJarPath.getName()));
-        latestJarPath.copyTo(context().websiteProjectFolder.resolve("src/resources/download").resolve("nuts-preview.jar"));
-        boolean previewIsStable = NWorkspace.of().getRuntimeId().getVersion().toString().equals(context().nutsStableRuntimeVersion);
-        if(previewIsStable){
-            latestJarPath.copyTo(context().websiteProjectFolder.resolve("src/resources/download").resolve("nuts-stable.jar"));
+        latestJarPath.copyTo(context().websiteProjectFolder.resolve("src/resources/download").resolve("nuts-standard.jar"));
+        boolean starndardIsStable = NWorkspace.of().getRuntimeId().getVersion().toString().equals(context().nutsStableRuntimeVersion);
+        if(starndardIsStable){
+            latestJarPath.copyTo(context().websiteProjectFolder.resolve("src/resources/download").resolve("nuts-lts.jar"));
         }
         remoteMkdirs(remoteTheVpcNutsPath().toString());
-        remoteCopyFile(latestJarPath, remoteTheVpcNutsPath().resolve("nuts-preview.jar"));
-        if(previewIsStable){
-            remoteCopyFile(latestJarPath, remoteTheVpcNutsPath().resolve("nuts-stable.jar"));
+        remoteCopyFile(latestJarPath, remoteTheVpcNutsPath().resolve("nuts-standard.jar"));
+        if(starndardIsStable){
+            remoteCopyFile(latestJarPath, remoteTheVpcNutsPath().resolve("nuts-lts.jar"));
         }
     }
 
 
-    private void runNutsPublishStable() {
+    private void runNutsPublishLts() {
         echoV("**** publish $nuts stable...", NMaps.of("nuts", NMsg.ofStyledKeyword("nuts")));
         NAssert.requireNonBlank(context().nutsStableAppVersion,"nutsAppStableVersion");
         String jarName = NWorkspace.of().getAppId().getArtifactId() + "-"+context().nutsStableAppVersion + ".jar";
 //        NPath.of("https://repo1.maven.org/maven2/" + Mvn.jar(NWorkspace.of().getAppId().builder().setVersion(context().nutsStableVersion).build()))
 //                        .copyTo(context().nutsRootFolder.resolve("installers/nuts-release-tool/dist").resolve(jarName));
 
-        NPath localJarStable = context().websiteProjectFolder.resolve("src/resources/download").resolve(jarName);
-        if(!localJarStable.isRegularFile()){
-            throw new NIllegalArgumentException(NMsg.ofC("unable to find nuts stable jar at : %s", localJarStable));
+        NPath localJarLts = context().websiteProjectFolder.resolve("src/resources/download").resolve(jarName);
+        if(!localJarLts.isRegularFile()){
+            throw new NIllegalArgumentException(NMsg.ofC("unable to find nuts LTS jar at : %s", localJarLts));
         }
 //        NPath.of("https://maven.thevpc.net/" + Mvn.jar(NWorkspace.of().getAppId().builder().setVersion(context().nutsStableAppVersion).build()))
-//                        .copyTo(localJarStable);
+//                        .copyTo(localJarLts);
 
-        localJarStable.copyTo(context().websiteProjectFolder.resolve("src/resources/download").resolve("nuts-stable.jar"));
+        localJarLts.copyTo(context().websiteProjectFolder.resolve("src/resources/download").resolve("nuts-lts.jar"));
 
         remoteMkdirs(remoteTheVpcNutsPath().toString());
         upload(
-                localJarStable
-                , remoteTheVpcNutsPath().resolve("nuts-stable.jar")
+                localJarLts
+                , remoteTheVpcNutsPath().resolve("nuts-lts.jar")
         );
     }
 
