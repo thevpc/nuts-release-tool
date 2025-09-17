@@ -37,7 +37,7 @@ public class NutsBuildRunnerContext {
     public String nutsDebugArg = null;
 
     public String nutsStableApiVersion = null;
-    public String nutsStableAppVersion = null;
+    public String nutsLtsVersion = null;
     public String nutsStableRuntimeVersion = null;
     private String remoteTheVpcSshConnexion;
 
@@ -95,7 +95,7 @@ public class NutsBuildRunnerContext {
                         return nutsStableApiVersion;
                     }
                     case "stableAppVersion": {
-                        return nutsStableAppVersion;
+                        return nutsLtsVersion;
                     }
                     case "stableRuntimeVersion": {
                         return nutsStableRuntimeVersion;
