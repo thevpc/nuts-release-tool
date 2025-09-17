@@ -48,7 +48,7 @@ public class JarsRunner extends AbstractRunner {
                 return cmdLine.matcher().matchEntry((v) -> context().nutsStableApiVersion = v.stringValue()).anyMatch();
             }
             case "--stable-app-version": {
-                return cmdLine.matcher().matchEntry((v) -> context().nutsStableAppVersion = v.stringValue()).anyMatch();
+                return cmdLine.matcher().matchEntry((v) -> context().nutsLtsVersion = v.stringValue()).anyMatch();
             }
             case "--stable-runtime-version": {
                 return cmdLine.matcher().matchEntry((v) -> context().nutsStableRuntimeVersion = v.stringValue()).anyMatch();
@@ -105,8 +105,8 @@ public class JarsRunner extends AbstractRunner {
 
     private void runNutsPublishLts() {
         echoV("**** publish $nuts stable...", NMaps.of("nuts", NMsg.ofStyledKeyword("nuts")));
-        NAssert.requireNonBlank(context().nutsStableAppVersion,"nutsAppStableVersion");
-        String jarName = NWorkspace.of().getAppId().getArtifactId() + "-"+context().nutsStableAppVersion + ".jar";
+        NAssert.requireNonBlank(context().nutsLtsVersion,"nutsAppStableVersion");
+        String jarName = NWorkspace.of().getAppId().getArtifactId() + "-"+context().nutsLtsVersion + ".jar";
 //        NPath.of("https://repo1.maven.org/maven2/" + Mvn.jar(NWorkspace.of().getAppId().builder().setVersion(context().nutsStableVersion).build()))
 //                        .copyTo(context().nutsRootFolder.resolve("installers/nuts-release-tool/dist").resolve(jarName));
 
