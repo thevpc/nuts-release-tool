@@ -75,12 +75,12 @@ public class SiteRunner extends AbstractRunner {
         vars.putAll(context().vars);
         vars.put("buildTime", new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date()));
         {//stable
-            NAssert.requireNonBlank(context().nutsStableAppVersion, "nutsStableVersion");
+            NAssert.requireNonBlank(context().nutsLtsVersion, "nutsStableVersion");
             NAssert.requireNonBlank(context().nutsStableApiVersion, "nutsApiStableVersion");
             NAssert.requireNonBlank(context().nutsStableRuntimeVersion, "runtimeStableVersion");
 
             NId stableApiId = NWorkspace.of().getApiId().builder().setVersion(context().nutsStableApiVersion).build();
-            NId stableAppId = NWorkspace.of().getAppId().builder().setVersion(context().nutsStableAppVersion).build();
+            NId stableAppId = NWorkspace.of().getAppId().builder().setVersion(context().nutsLtsVersion).build();
             NId stableRuntimeId = NWorkspace.of().getRuntimeId().builder().setVersion(context().nutsStableRuntimeVersion).build();
 
             String stableJarLocation = "https://maven.thevpc.net/" + Mvn.jar(stableAppId);
