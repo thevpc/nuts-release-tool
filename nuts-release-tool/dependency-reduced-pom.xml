@@ -4,7 +4,7 @@
   <groupId>net.thevpc.nuts.installers</groupId>
   <artifactId>nuts-release-tool</artifactId>
   <name>Nuts Community Build Tool</name>
-  <version>0.8.6.0</version>
+  <version>0.8.7.0</version>
   <description>Nuts Build Tool</description>
   <url>https://github.com/thevpc/nuts</url>
   <developers>
@@ -222,11 +222,11 @@
     </profile>
   </profiles>
   <properties>
-    <nuts.gui>true</nuts.gui>
-    <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <nuts.gui>true</nuts.gui>
     <nuts.categories>/Settings/PackageManager/Nuts
             /Utilities</nuts.categories>
+    <maven.compiler.source>1.8</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <nuts.genericName>NutsBuildTool</nuts.genericName>
     <github.global.server>github</github.global.server>
