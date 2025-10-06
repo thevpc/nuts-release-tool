@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 
-import net.thevpc.nuts.NOut;
+import net.thevpc.nuts.io.NOut;
 import net.thevpc.nuts.build.util.ConfReader;
 import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.io.NPath;
