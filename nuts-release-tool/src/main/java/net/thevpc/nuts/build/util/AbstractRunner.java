@@ -1,9 +1,13 @@
 package net.thevpc.nuts.build.util;
 
-import net.thevpc.nuts.*;
+import net.thevpc.nuts.app.NApp;
+import net.thevpc.nuts.artifact.NId;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
-import net.thevpc.nuts.format.NCmdLineFormat;
+import net.thevpc.nuts.command.NExecCmd;
+import net.thevpc.nuts.core.NSession;
+import net.thevpc.nuts.io.NOut;
+import net.thevpc.nuts.text.NCmdLineFormat;
 import net.thevpc.nuts.io.NPath;
 import net.thevpc.nuts.io.NPathOption;
 import net.thevpc.nuts.util.NArrays;
