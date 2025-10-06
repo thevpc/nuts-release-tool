@@ -4,7 +4,7 @@
  */
 package net.thevpc.nuts.build.util;
 
-import net.thevpc.nuts.NIllegalArgumentException;
+import net.thevpc.nuts.util.NIllegalArgumentException;
 import net.thevpc.nuts.build.base.NutsBuildRunnerContext;
 import net.thevpc.nuts.io.NPath;
 import net.thevpc.nuts.util.NBlankable;
