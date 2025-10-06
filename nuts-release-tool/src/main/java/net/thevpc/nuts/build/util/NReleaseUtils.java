@@ -1,9 +1,9 @@
 package net.thevpc.nuts.build.util;
 
-import net.thevpc.nuts.NDescriptor;
-import net.thevpc.nuts.NDescriptorParser;
-import net.thevpc.nuts.NDescriptorStyle;
-import net.thevpc.nuts.NIllegalArgumentException;
+import net.thevpc.nuts.artifact.NDescriptor;
+import net.thevpc.nuts.artifact.NDescriptorParser;
+import net.thevpc.nuts.artifact.NDescriptorStyle;
+import net.thevpc.nuts.util.NIllegalArgumentException;
 import net.thevpc.nuts.io.NPath;
 import net.thevpc.nuts.util.NMsg;
 import net.thevpc.nuts.util.NOptional;
