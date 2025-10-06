@@ -1,7 +1,7 @@
 package net.thevpc.nuts.build.base;
 
-import net.thevpc.nuts.NApp;
-import net.thevpc.nuts.NOut;
+import net.thevpc.nuts.app.NApp;
+import net.thevpc.nuts.io.NOut;
 import net.thevpc.nuts.build.util.AbstractRunner;
 import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.cmdline.NCmdLineConfigurable;
