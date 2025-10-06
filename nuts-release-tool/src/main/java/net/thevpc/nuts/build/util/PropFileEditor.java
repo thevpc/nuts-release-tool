@@ -1,6 +1,6 @@
 package net.thevpc.nuts.build.util;
 
-import net.thevpc.nuts.NSession;
+import net.thevpc.nuts.core.NSession;
 import net.thevpc.nuts.io.NPath;
 
 public class PropFileEditor {
