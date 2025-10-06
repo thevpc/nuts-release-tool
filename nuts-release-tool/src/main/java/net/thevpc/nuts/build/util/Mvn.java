@@ -4,8 +4,8 @@
  */
 package net.thevpc.nuts.build.util;
 
-import net.thevpc.nuts.NId;
-import net.thevpc.nuts.NVersion;
+import net.thevpc.nuts.artifact.NId;
+import net.thevpc.nuts.artifact.NVersion;
 
 /**
  *
