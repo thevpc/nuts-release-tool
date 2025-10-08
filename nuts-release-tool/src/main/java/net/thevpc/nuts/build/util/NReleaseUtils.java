@@ -5,7 +5,7 @@ import net.thevpc.nuts.artifact.NDescriptorParser;
 import net.thevpc.nuts.artifact.NDescriptorStyle;
 import net.thevpc.nuts.util.NIllegalArgumentException;
 import net.thevpc.nuts.io.NPath;
-import net.thevpc.nuts.util.NMsg;
+import net.thevpc.nuts.text.NMsg;
 import net.thevpc.nuts.util.NOptional;
 
 public class NReleaseUtils {
