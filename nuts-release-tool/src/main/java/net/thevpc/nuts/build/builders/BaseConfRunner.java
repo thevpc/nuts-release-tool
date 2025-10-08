@@ -10,7 +10,7 @@ import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.io.NPath;
 import net.thevpc.nuts.util.NAssert;
 import net.thevpc.nuts.util.NIllegalArgumentException;
-import net.thevpc.nuts.util.NMsg;
+import net.thevpc.nuts.text.NMsg;
 
 /**
  * @author vpc
