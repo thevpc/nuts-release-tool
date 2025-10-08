@@ -7,7 +7,7 @@ import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.cmdline.NCmdLineConfigurable;
 import net.thevpc.nuts.spi.NScopeType;
 import net.thevpc.nuts.time.NChronometer;
-import net.thevpc.nuts.util.NMsg;
+import net.thevpc.nuts.text.NMsg;
 
 public class NutsReleaseToolRunner {
 
