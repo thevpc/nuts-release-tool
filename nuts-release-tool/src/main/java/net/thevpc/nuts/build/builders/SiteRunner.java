@@ -17,7 +17,7 @@ import net.thevpc.nsite.context.ProjectNSiteContext;
 import net.thevpc.nuts.util.NMaps;
 import net.thevpc.nsite.NSiteProjectConfig;
 import net.thevpc.nuts.util.NAssert;
-import net.thevpc.nuts.util.NMsg;
+import net.thevpc.nuts.text.NMsg;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
