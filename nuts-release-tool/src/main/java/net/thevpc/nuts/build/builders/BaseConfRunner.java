@@ -12,6 +12,8 @@ import net.thevpc.nuts.util.NAssert;
 import net.thevpc.nuts.util.NIllegalArgumentException;
 import net.thevpc.nuts.text.NMsg;
 
+import java.util.Map;
+
 /**
  * @author vpc
  */
@@ -64,19 +66,19 @@ public class BaseConfRunner extends AbstractRunner {
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
-        NCmdLine cmdLine2=cmdLine.copy();
+        NCmdLine cmdLine2 = cmdLine.copy();
         while (cmdLine2.hasNext()) {
-            if(cmdLine2.matcher()
-                    .with("--root").matchEntry(a->{
+            if (cmdLine2.matcher()
+                    .with("--root").matchEntry(a -> {
                         NPath newRoot = NPath.of(a.stringValue()).toAbsolute().normalize();
                         NReleaseUtils.ensureNutsRepoFolder(newRoot);
                         context().nutsRootFolder = newRoot;
                     })
-                    .with("--conf").matchEntry(a->{
+                    .with("--conf").matchEntry(a -> {
                         NPath conf = NPath.of(a.stringValue()).toAbsolute().normalize();
                         context().confFile = conf;
                     })
-                    .noMatch()){
+                    .noMatch()) {
                 cmdLine2.skip();
             }
         }
@@ -91,26 +93,29 @@ public class BaseConfRunner extends AbstractRunner {
             }
         }
         if (context().confFile == null) {
-            if(NPath.of("nuts-release-tool/"+NUTS_RELEASE_CONF).isRegularFile()) {
-                context().confFile = NPath.of("nuts-release-tool/"+NUTS_RELEASE_CONF).toAbsolute().normalize();
+            if (NPath.of("nuts-release-tool/" + NUTS_RELEASE_CONF).isRegularFile()) {
+                context().confFile = NPath.of("nuts-release-tool/" + NUTS_RELEASE_CONF).toAbsolute().normalize();
             }
         }
         if (context().confFile == null) {
-            if(NPath.of("nuts-release-tool/nuts-release-tool/"+NUTS_RELEASE_CONF).isRegularFile()) {
-                context().confFile = NPath.of("nuts-release-tool/nuts-release-tool/"+NUTS_RELEASE_CONF).toAbsolute().normalize();
+            if (NPath.of("nuts-release-tool/nuts-release-tool/" + NUTS_RELEASE_CONF).isRegularFile()) {
+                context().confFile = NPath.of("nuts-release-tool/nuts-release-tool/" + NUTS_RELEASE_CONF).toAbsolute().normalize();
             }
         }
         if (context().confFile == null) {
             throw new NIllegalArgumentException(NMsg.ofC("missing %s", NPath.of(NUTS_RELEASE_CONF).toAbsolute().normalize()));
         }
         if (context().confFile.isDirectory()) {
-            context().confFile=context().confFile.resolve(NUTS_RELEASE_CONF);
+            context().confFile = context().confFile.resolve(NUTS_RELEASE_CONF);
             throw new NIllegalArgumentException(NMsg.ofC("missing %s", NPath.of(NUTS_RELEASE_CONF).toAbsolute().normalize()));
+        }
+        for (Map.Entry<String, String> e : NopsEnv.getNopsEnv().entrySet()) {
+            context().setVar(e.getKey(), e.getValue());
         }
         if (!context().confFile.isRegularFile()) {
             throw new NIllegalArgumentException(NMsg.ofC("missing %s", context().confFile));
-        }else{
-            context().loadConfig(context().confFile,cmdLine);
+        } else {
+            context().loadConfig(context().confFile, cmdLine);
         }
         context().websiteProjectFolder = context().nutsRootFolder.resolve("documentation/website");
         context().repositoryProjectFolder = context().nutsRootFolder.resolve("documentation/repo");
