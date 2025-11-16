@@ -25,6 +25,7 @@ public class NutsReleaseToolMain  {
                             new JarsRunner(),
                             new ReposRunner(),
                             new InstallerRunner(),
+                            new CompatRunner(),
                             new SiteRunner()
                     );
                     nutsBuildRunner.run(
