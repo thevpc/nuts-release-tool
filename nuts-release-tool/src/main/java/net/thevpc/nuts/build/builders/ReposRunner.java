@@ -8,8 +8,11 @@ import net.thevpc.nuts.build.util.*;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.command.NExecCmd;
+import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.util.NMaps;
 import net.thevpc.nuts.text.NMsg;
+
+import java.util.Map;
 
 /**
  * @author vpc
@@ -20,6 +23,22 @@ public class ReposRunner extends AbstractRunner {
     boolean repoPublic = false;
 
     @Override
+    public void configureBeforeOptions(NCmdLine cmdLine) {
+        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot.asObject().orNull()).entrySet()) {
+            switch (e.getKey()) {
+                case "build-repo-nuts-preview": {
+                    repoPreview=e.getValue().asBooleanValue().orElse(false);
+                    break;
+                }
+                case "build-repo-nuts-public": {
+                    repoPublic=e.getValue().asBooleanValue().orElse(false);
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
     public void configureAfterOptions() {
 
     }
@@ -27,16 +46,6 @@ public class ReposRunner extends AbstractRunner {
     @Override
     public boolean configureFirst(NCmdLine cmdLine) {
         NArg c = cmdLine.peek().orNull();
-        switch (c.key()) {
-            case "build-repo-nuts-preview": {
-                cmdLine.matcher().matchFlag((v) -> repoPreview = v.booleanValue()).anyMatch();
-                return true;
-            }
-            case "build-repo-nuts-public": {
-                cmdLine.matcher().matchFlag((v) -> repoPublic = v.booleanValue()).anyMatch();
-                return true;
-            }
-        }
         return false;
     }
 
@@ -45,17 +54,12 @@ public class ReposRunner extends AbstractRunner {
     }
 
     @Override
-    public void configureBeforeOptions(NCmdLine cmdLine) {
-        //do nothing
-    }
-
-    @Override
     public void run() {
         if (repoPreview) {
             echoV("**** $v (nuts settings update stats)...", NMaps.of("v", NMsg.ofStyledKeyword("build-nuts-preview")));
             NExecCmd.of()
                     .addCommand("settings", "update", "stats")
-                    .addCommand(context().nutsRootFolder.resolve("../nuts-preview"))
+                    .addCommand(context().nutsRootFolder.resolve("../nuts-repos/nuts-preview"))
                     .failFast()
                     .run();
         }
@@ -63,7 +67,7 @@ public class ReposRunner extends AbstractRunner {
             echoV("**** $v (nuts settings update stats)...", NMaps.of("v", NMsg.ofStyledKeyword("build-nuts-public")));
             NExecCmd.of()
                     .addCommand("settings", "update", "stats")
-                    .addCommand(context().nutsRootFolder.resolve("../nuts-public"))
+                    .addCommand(context().nutsRootFolder.resolve("../nuts-repos/nuts-public"))
                     .failFast()
                     .run();
         }
