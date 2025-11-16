@@ -2,16 +2,23 @@ package net.thevpc.nuts.build.builders;
 
 import net.thevpc.nuts.artifact.NId;
 import net.thevpc.nuts.build.util.AbstractRunner;
+import net.thevpc.nuts.build.util.NReleaseUtils;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.core.NWorkspace;
+import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.io.NPath;
 import net.thevpc.nuts.text.NMsg;
 import net.thevpc.nuts.util.*;
 
 import net.thevpc.nuts.build.util.Mvn;
 
+import java.util.Map;
+
 public class JarsRunner extends AbstractRunner {
+    public boolean keepStamp = false;
+    public boolean updateVersion = false;
+    public Boolean productionMode = null;
 
     public boolean buildJars = false;
     public JarsRunner() {
@@ -20,6 +27,38 @@ public class JarsRunner extends AbstractRunner {
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
+        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot.asObject().orNull()).entrySet()) {
+            switch (e.getKey()) {
+                case "update-version": {
+                    updateVersion=e.getValue().asBooleanValue().orElse(false);
+                    break;
+                }
+                case "keep-stamp": {
+                    keepStamp=e.getValue().asBooleanValue().orElse(false);
+                    break;
+                }
+                case "production-mode": {
+                    productionMode=e.getValue().asBooleanValue().orElse(false);
+                    break;
+                }
+                case "lts-api-version": {
+                    context().nutsLtsApiVersion =e.getValue().asStringValue().get();
+                    break;
+                }
+                case "lts-app-version": {
+                    context().nutsLtsAppVersion =e.getValue().asStringValue().get();
+                    break;
+                }
+                case "lts-runtime-version": {
+                    context().nutsLtsRuntimeVersion =e.getValue().asStringValue().get();
+                    break;
+                }
+                case "remote-ssh-host": {
+                    context().remoteTheVpcSshUser=e.getValue().asStringValue().get();
+                    break;
+                }
+            }
+        }
     }
 
     @Override
@@ -35,38 +74,7 @@ public class JarsRunner extends AbstractRunner {
     @Override
     public boolean configureFirst(NCmdLine cmdLine) {
         NArg c = cmdLine.peek().orNull();
-        switch (c.key()) {
-            case "--update-version": {
-                return cmdLine.matcher().matchFlag((v) -> context().updateVersion = v.booleanValue()).anyMatch();
-            }
-            case "--keep-stamp": {
-                return cmdLine.matcher().matchFlag((v) -> context().keepStamp = v.booleanValue()).anyMatch();
-            }
-            case "--production-mode": {
-                return cmdLine.matcher().matchFlag((v) -> context().productionMode = v.booleanValue()).anyMatch();
-            }
 
-            case "--stable-api-version": {
-                return cmdLine.matcher().matchEntry((v) -> context().nutsStableApiVersion = v.stringValue()).anyMatch();
-            }
-            case "--stable-app-version": {
-                return cmdLine.matcher().matchEntry((v) -> context().nutsLtsVersion = v.stringValue()).anyMatch();
-            }
-            case "--stable-runtime-version": {
-                return cmdLine.matcher().matchEntry((v) -> context().nutsStableRuntimeVersion = v.stringValue()).anyMatch();
-            }
-
-            case "--remote-ssh-user": {
-                return cmdLine.matcher().matchEntry((v) -> context().remoteTheVpcSshUser = v.stringValue()).anyMatch();
-            }
-            case "--remote-ssh-host": {
-                return cmdLine.matcher().matchEntry((v) -> context().remoteTheVpcSshUser = v.stringValue()).anyMatch();
-            }
-//            case "build-jars": {
-//                return cmdLine.selector().withNextFlag((v, a, s) -> buildJars = v);
-//                return true;
-//            }
-        }
         return false;
     }
 
@@ -93,7 +101,7 @@ public class JarsRunner extends AbstractRunner {
         NPath latestJarPath = localMvn().resolve(Mvn.jar(NWorkspace.of().getAppId()));
         latestJarPath.copyTo(context().websiteProjectFolder.resolve("src/resources/download").resolve(latestJarPath.getName()));
         latestJarPath.copyTo(context().websiteProjectFolder.resolve("src/resources/download").resolve("nuts-standard.jar"));
-        boolean starndardIsStable = NWorkspace.of().getRuntimeId().getVersion().toString().equals(context().nutsStableRuntimeVersion);
+        boolean starndardIsStable = NWorkspace.of().getRuntimeId().getVersion().toString().equals(context().nutsLtsRuntimeVersion);
         if(starndardIsStable){
             latestJarPath.copyTo(context().websiteProjectFolder.resolve("src/resources/download").resolve("nuts-lts.jar"));
         }
@@ -107,8 +115,8 @@ public class JarsRunner extends AbstractRunner {
 
     private void runNutsPublishLts() {
         echoV("**** publish $nuts stable...", NMaps.of("nuts", NMsg.ofStyledKeyword("nuts")));
-        NAssert.requireNonBlank(context().nutsLtsVersion,"nutsAppStableVersion");
-        String jarName = NWorkspace.of().getAppId().getArtifactId() + "-"+context().nutsLtsVersion + ".jar";
+        NAssert.requireNonBlank(context().nutsLtsAppVersion,"nutsAppStableVersion");
+        String jarName = NWorkspace.of().getAppId().getArtifactId() + "-"+context().nutsLtsAppVersion + ".jar";
 //        NPath.of("https://repo1.maven.org/maven2/" + Mvn.jar(NWorkspace.of().getAppId().builder().setVersion(context().nutsStableVersion).build()))
 //                        .copyTo(context().nutsRootFolder.resolve("installers/nuts-release-tool/dist").resolve(jarName));
 
