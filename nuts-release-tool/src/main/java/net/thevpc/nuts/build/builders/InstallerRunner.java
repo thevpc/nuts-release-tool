@@ -8,10 +8,14 @@ import net.thevpc.nuts.build.util.*;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 
+import net.thevpc.nuts.core.NSession;
+import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.io.NPath;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * @author vpc
@@ -32,6 +36,26 @@ public class InstallerRunner extends AbstractRunner {
     boolean buildBin = false;
 
     @Override
+    public void configureBeforeOptions(NCmdLine cmdLine) {
+        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot.asObject().orNull()).entrySet()) {
+            switch (e.getKey()) {
+                case "build-native": {
+                    buildNative=e.getValue().asBooleanValue().orElse(false);
+                    break;
+                }
+                case "build-installer": {
+                    buildInstaller=e.getValue().asBooleanValue().orElse(false);
+                    break;
+                }
+                case "build-bin": {
+                    buildBin=e.getValue().asBooleanValue().orElse(false);
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
     public void configureAfterOptions() {
         NUTS_JAVA_HOME.update(context()).ensureDirectory();
         NUTS_INSTALLER_BUILD_JAVA_HOME.update(context()).ensureDirectory();
@@ -41,21 +65,6 @@ public class InstallerRunner extends AbstractRunner {
     @Override
     public boolean configureFirst(NCmdLine cmdLine) {
         NArg c = cmdLine.peek().orNull();
-        switch (c.key()) {
-            case "--native": {
-                return cmdLine.matcher().matchFlag((v) -> buildNative = v.booleanValue()).anyMatch();
-            }
-            case "build-installer": {
-                return cmdLine.matcher().matchFlag((v) -> {
-                    buildInstaller = v.booleanValue();
-                }).anyMatch();
-            }
-            case "build-bin": {
-                return cmdLine.matcher().matchFlag((v) -> {
-                    buildBin = v.booleanValue();
-                }).anyMatch();
-            }
-        }
         return false;
     }
 
@@ -63,10 +72,6 @@ public class InstallerRunner extends AbstractRunner {
         super();
     }
 
-    @Override
-    public void configureBeforeOptions(NCmdLine cmdLine) {
-
-    }
 
     @Override
     public void run() {
