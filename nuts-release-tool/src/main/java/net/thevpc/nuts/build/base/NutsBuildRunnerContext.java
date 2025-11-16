@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 
+import net.thevpc.nuts.elem.*;
 import net.thevpc.nuts.io.NOut;
 import net.thevpc.nuts.build.util.ConfReader;
 import net.thevpc.nuts.cmdline.NCmdLine;
@@ -23,9 +24,6 @@ import net.thevpc.nuts.util.NOptional;
 public class NutsBuildRunnerContext {
 
     public Map<String, String> vars = new HashMap<>();
-    public boolean keepStamp = false;
-    public boolean updateVersion = false;
-    public Boolean productionMode = null;
     public String home = System.getProperty("user.home");
     public String remoteTheVpcSshUser = System.getProperty("user.name");
     public String remoteTheVpcSshHost = "thevpc.net";
@@ -33,13 +31,14 @@ public class NutsBuildRunnerContext {
     public boolean publish;
     public NPath websiteProjectFolder;
     public NPath repositoryProjectFolder;
-    public NPath confFile;
+    public NPath confFileTson;
     public String nutsDebugArg = null;
 
-    public String nutsStableApiVersion = null;
-    public String nutsLtsVersion = null;
-    public String nutsStableRuntimeVersion = null;
+    public String nutsLtsApiVersion = null;
+    public String nutsLtsAppVersion = null;
+    public String nutsLtsRuntimeVersion = null;
     private String remoteTheVpcSshConnexion;
+    public NElement confRoot;
 
     public boolean verbose = false;
     public boolean trace = false;
@@ -92,13 +91,13 @@ public class NutsBuildRunnerContext {
                         return getRemoteTheVpcSshUser();
                     }
                     case "stableApiVersion": {
-                        return nutsStableApiVersion;
+                        return nutsLtsApiVersion;
                     }
                     case "stableAppVersion": {
-                        return nutsLtsVersion;
+                        return nutsLtsAppVersion;
                     }
                     case "stableRuntimeVersion": {
-                        return nutsStableRuntimeVersion;
+                        return nutsLtsRuntimeVersion;
                     }
                     case "root":
                     case "rootFolder":
@@ -121,14 +120,11 @@ public class NutsBuildRunnerContext {
         this.vars.put(key, value);
     }
 
-    public void loadConfig(NPath conf, NCmdLine cmdLine) {
-        NOut.println(NMsg.ofC("loadConfig %s",conf));
-        for (Map.Entry<String, String> e : ConfReader.readEntries(conf)) {
-            if ("OPTIONS".equals(e.getKey())) {
-                cmdLine.addAll(NCmdLine.parseDefault(e.getValue()).get().toStringList());
-            } else {
-                this.vars.put(e.getKey(), e.getValue());
-            }
+    public void loadConfig(NCmdLine cmdLine) {
+        if (this.confFileTson.isRegularFile()) {
+            NOut.println(NMsg.ofC("loadConfig %s", this.confFileTson));
+            confRoot = NElementParser.ofTson().parse(confFileTson);
+
         }
     }
 }
