@@ -7,10 +7,12 @@ package net.thevpc.nuts.build.builders;
 import net.thevpc.nuts.artifact.NId;
 import net.thevpc.nuts.build.util.AbstractRunner;
 import net.thevpc.nuts.build.util.Mvn;
+import net.thevpc.nuts.build.util.NReleaseUtils;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 
 import net.thevpc.nuts.core.NWorkspace;
+import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.io.NPath;
 import net.thevpc.nsite.context.NSiteContext;
 import net.thevpc.nsite.context.ProjectNSiteContext;
@@ -29,7 +31,7 @@ import java.util.Map;
  */
 public class SiteRunner extends AbstractRunner {
 
-    boolean NUTS_FLAG_SITE = false;
+    boolean buildSite = false;
 
     public SiteRunner() {
         super();
@@ -37,24 +39,25 @@ public class SiteRunner extends AbstractRunner {
 
 
     @Override
-    public boolean configureFirst(NCmdLine cmdLine) {
-        NArg c = cmdLine.peek().orNull();
-        switch (c.key()) {
-            case "site": {
-                cmdLine.matcher().matchFlag((v) -> NUTS_FLAG_SITE = v.booleanValue()).anyMatch();
-                return true;
+    public void configureBeforeOptions(NCmdLine cmdLine) {
+        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot.asObject().orNull()).entrySet()) {
+            switch (e.getKey()) {
+                case "build-site": {
+                    buildSite=e.getValue().asBooleanValue().orElse(false);
+                    break;
+                }
             }
         }
+    }
+    @Override
+    public boolean configureFirst(NCmdLine cmdLine) {
+        NArg c = cmdLine.peek().orNull();
         return false;
     }
 
     @Override
-    public void configureBeforeOptions(NCmdLine cmdLine) {
-    }
-
-    @Override
     public void run() {
-        if (NUTS_FLAG_SITE) {
+        if (buildSite) {
             runSite();
         }
     }
@@ -76,13 +79,13 @@ public class SiteRunner extends AbstractRunner {
         vars.putAll(context().vars);
         vars.put("buildTime", new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date()));
         {//stable
-            NAssert.requireNonBlank(context().nutsLtsVersion, "nutsStableVersion");
-            NAssert.requireNonBlank(context().nutsStableApiVersion, "nutsApiStableVersion");
-            NAssert.requireNonBlank(context().nutsStableRuntimeVersion, "runtimeStableVersion");
+            NAssert.requireNonBlank(context().nutsLtsAppVersion, "nutsStableVersion");
+            NAssert.requireNonBlank(context().nutsLtsApiVersion, "nutsApiStableVersion");
+            NAssert.requireNonBlank(context().nutsLtsRuntimeVersion, "runtimeStableVersion");
 
-            NId stableApiId = NWorkspace.of().getApiId().builder().setVersion(context().nutsStableApiVersion).build();
-            NId stableAppId = NWorkspace.of().getAppId().builder().setVersion(context().nutsLtsVersion).build();
-            NId stableRuntimeId = NWorkspace.of().getRuntimeId().builder().setVersion(context().nutsStableRuntimeVersion).build();
+            NId stableApiId = NWorkspace.of().getApiId().builder().setVersion(context().nutsLtsApiVersion).build();
+            NId stableAppId = NWorkspace.of().getAppId().builder().setVersion(context().nutsLtsAppVersion).build();
+            NId stableRuntimeId = NWorkspace.of().getRuntimeId().builder().setVersion(context().nutsLtsRuntimeVersion).build();
 
             String stableJarLocation = "https://maven.thevpc.net/" + Mvn.jar(stableAppId);
 
