@@ -4,18 +4,13 @@
  */
 package net.thevpc.nuts.build.builders;
 
-import net.thevpc.nsite.NSiteProjectConfig;
-import net.thevpc.nsite.context.NSiteContext;
-import net.thevpc.nsite.context.ProjectNSiteContext;
-import net.thevpc.nuts.artifact.NId;
+import net.thevpc.nuts.Nuts;
 import net.thevpc.nuts.artifact.NVersion;
 import net.thevpc.nuts.build.util.AbstractRunner;
-import net.thevpc.nuts.build.util.Mvn;
 import net.thevpc.nuts.build.util.NReleaseUtils;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.command.NExecCmd;
-import net.thevpc.nuts.core.NWorkspace;
 import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.io.NIOException;
 import net.thevpc.nuts.io.NPath;
@@ -27,7 +22,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -81,6 +75,10 @@ public class CompatRunner extends AbstractRunner {
         }
         if (allVersions.isEmpty()) {
             for (String v : new String[]{
+                    "0.8.0",
+                    "0.8.1",
+                    "0.8.2",
+                    "0.8.3",
                     "0.8.4",
                     "0.8.5",
                     "0.8.6",
@@ -114,7 +112,10 @@ public class CompatRunner extends AbstractRunner {
                 String compatId = allVersionsArray[i] + "_" + allVersionsArray[j];
                 compatMap.put(
                         compatId,
-                        runCompat(allVersionsArray[i], allVersionsArray[j],false)
+                        runCompat(allVersionsArray[i], allVersionsArray[j],
+                                allVersionsArray[i].equals(Nuts.getVersion())
+                                        || allVersionsArray[j].equals(Nuts.getVersion())
+                        )
                 );
             }
         }
@@ -244,7 +245,7 @@ public class CompatRunner extends AbstractRunner {
         return (brightness < 128) ? "#ffffff" : "#000000";
     }
 
-    private double runCompat(NVersion from, NVersion to,boolean force) {
+    private double runCompat(NVersion from, NVersion to, boolean force) {
         NPath reportPath = context().websiteProjectFolder.resolve(
                 NMsg.ofV("src/main/compat_reports/nuts/${i}_to_${j}/compat_report.html", v -> {
                     switch (v) {
@@ -256,8 +257,8 @@ public class CompatRunner extends AbstractRunner {
                     return null;
                 }).toString()
         );
-        if(!force){
-            if(reportPath.isRegularFile()){
+        if (!force) {
+            if (reportPath.isRegularFile()) {
                 echoV("**** reload $v $s1→$s2 (nuts)...", NMaps.of("v", NMsg.ofStyledKeyword("build-compat"), "s1", from, "s2", to));
                 return parseCompatibility(reportPath);
             }
@@ -285,30 +286,30 @@ public class CompatRunner extends AbstractRunner {
     }
 
     double parseCompatibility(NPath from) {
-        String comptaClass=null;
-        double comptaValue=0.0;
-        try(BufferedReader br = from.getBufferedReader()) {
-            while(true) {
+        String comptaClass = null;
+        double comptaValue = 0.0;
+        try (BufferedReader br = from.getBufferedReader()) {
+            while (true) {
                 String line = br.readLine();
-                if(line == null) {
+                if (line == null) {
                     break;
                 }
-                if(line.startsWith("<tr><th>Compatibility</th>")) {
+                if (line.startsWith("<tr><th>Compatibility</th>")) {
                     line = br.readLine();
-                    if(line == null) {
+                    if (line == null) {
                         break;
                     }
                     Pattern vv = Pattern.compile("<td class='(?<c>[^']+)'>(?<v>[^%<]+)%</td>");
                     Matcher m = vv.matcher(line);
-                    if(m.matches()) {
+                    if (m.matches()) {
                         String c = m.group("c");
                         String v = m.group("v");
-                        comptaValue=Double.parseDouble(v)*0.01;
+                        comptaValue = Double.parseDouble(v) * 0.01;
                     }
                     break;
                 }
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new NIOException(e);
         }
         return comptaValue;
