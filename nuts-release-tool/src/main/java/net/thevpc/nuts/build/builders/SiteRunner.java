@@ -31,7 +31,6 @@ import java.util.Map;
  */
 public class SiteRunner extends AbstractRunner {
 
-    boolean buildSite = false;
 
     public SiteRunner() {
         super();
@@ -43,7 +42,7 @@ public class SiteRunner extends AbstractRunner {
         for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot.asObject().orNull()).entrySet()) {
             switch (e.getKey()) {
                 case "build-site": {
-                    buildSite=e.getValue().asBooleanValue().orElse(false);
+                    context().buildSite=e.getValue().asBooleanValue().orElse(false);
                     break;
                 }
             }
@@ -57,7 +56,7 @@ public class SiteRunner extends AbstractRunner {
 
     @Override
     public void run() {
-        if (buildSite) {
+        if (context().buildSite) {
             runSite();
         }
     }
