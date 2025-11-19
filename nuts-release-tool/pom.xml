@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.thevpc.nuts.installers</groupId>
     <artifactId>nuts-release-tool</artifactId>
-    <version>0.8.8.0</version>
+    <version>0.8.9.0</version>
     <packaging>jar</packaging>
     <name>Nuts Community Build Tool</name>
     <url>https://github.com/thevpc/nuts</url>
@@ -25,9 +25,9 @@
         <url>https://github.com/thevpc/nuts/tree/master</url>
     </scm>
     <dependencies>
-        <dependency><groupId>net.thevpc.nuts</groupId><artifactId>nuts</artifactId><version>0.8.8</version></dependency>
-        <dependency><groupId>net.thevpc.nuts</groupId><artifactId>nuts</artifactId><version>0.8.8</version></dependency>
-        <dependency><groupId>net.thevpc.nsite</groupId><artifactId>nsite-lib</artifactId><version>0.8.8.0</version></dependency>
+        <dependency><groupId>net.thevpc.nuts</groupId><artifactId>nuts</artifactId><version>0.8.9</version></dependency>
+        <dependency><groupId>net.thevpc.nuts</groupId><artifactId>nuts</artifactId><version>0.8.9</version></dependency>
+        <dependency><groupId>net.thevpc.nsite</groupId><artifactId>nsite-lib</artifactId><version>0.8.9.0</version></dependency>
         <dependency><groupId>org.yaml</groupId><artifactId>snakeyaml</artifactId><version>2.2</version></dependency>
     </dependencies>
 
@@ -205,7 +205,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.8</version>
+                        <version>0.8.9</version>
                         <executions>
                             <execution>
                                 <goals>
