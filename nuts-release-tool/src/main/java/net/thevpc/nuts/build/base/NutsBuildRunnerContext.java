@@ -29,6 +29,8 @@ public class NutsBuildRunnerContext {
     public String remoteTheVpcSshHost = "thevpc.net";
     public NPath nutsRootFolder;
     public boolean publish;
+    public boolean buildSite = false;
+
     public NPath websiteProjectFolder;
     public NPath repositoryProjectFolder;
     public NPath confFileTson;
