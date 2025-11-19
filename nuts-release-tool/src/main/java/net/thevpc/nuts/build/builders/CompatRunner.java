@@ -8,6 +8,7 @@ import net.thevpc.nuts.Nuts;
 import net.thevpc.nuts.artifact.NVersion;
 import net.thevpc.nuts.build.util.AbstractRunner;
 import net.thevpc.nuts.build.util.NReleaseUtils;
+import net.thevpc.nuts.build.util.NativeBuilder;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.command.NExecCmd;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,22 +101,30 @@ public class CompatRunner extends AbstractRunner {
     @Override
     public void run() {
         if (buildCompat) {
-            runCompat();
+            runCompat(false);
+        } else {
+            if (context().buildSite) {
+                runCompat(true);
+            }
         }
     }
 
-    private void runCompat() {
+    private void runCompat(boolean readOnly) {
         echoV("**** $v (nuts)...", NMaps.of("v", NMsg.ofStyledKeyword("build-compat")));
         NVersion[] allVersionsArray = allVersions.toArray(new NVersion[0]);
         Map<String, Double> compatMap = new HashMap<>();
         for (int i = 0; i < allVersionsArray.length; i++) {
             for (int j = i + 1; j < allVersionsArray.length; j++) {
                 String compatId = allVersionsArray[i] + "_" + allVersionsArray[j];
+                boolean force = allVersionsArray[i].equals(Nuts.getVersion())
+                        || allVersionsArray[j].equals(Nuts.getVersion());
+                if (readOnly) {
+                    force = false;
+                }
                 compatMap.put(
                         compatId,
                         runCompat(allVersionsArray[i], allVersionsArray[j],
-                                allVersionsArray[i].equals(Nuts.getVersion())
-                                        || allVersionsArray[j].equals(Nuts.getVersion())
+                                force
                         )
                 );
             }
@@ -125,52 +135,74 @@ public class CompatRunner extends AbstractRunner {
     private void generateCompatFile(Map<String, Double> compatMap) {
         echoV("**** $n $v...", NMaps.of("n", NMsg.ofStyledPrimary4("nuts"), "v", NMsg.ofStyledKeyword("build-compat-matrix")));
         NVersion[] allVersionsArray = allVersions.toArray(new NVersion[0]);
-        NPath file = context().websiteProjectFolder.resolve("src/main/compat.html");
         String title = "Nuts API Compatibility Matrix";
-        try (PrintStream out = file.mkParentDirs().getPrintStream()) {
-            out.println("<!DOCTYPE html>\n" +
-                    "<html lang=\"en\">\n" +
-                    "<head>\n" +
-                    "    <meta charset=\"UTF-8\">\n" +
-                    "    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n" +
-                    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no\">\n" +
-                    "    <link href=\"assets/images/favicon.ico\" rel=\"icon\"/>\n" +
-                    "    <title>" + title + "</title>\n" +
-                    "    <meta name=\"description\" content=\"Nuts Java Package Manager\">\n" +
-                    "    <meta name=\"author\" content=\"thevpc\">\n" +
-                    "    <!-- Bootstrap -->\n" +
-                    "    <link rel=\"stylesheet\" type=\"text/css\" href=\"assets/vendor/bootstrap/css/bootstrap.min.css\"/>\n" +
-                    "    <!-- Font Awesome Icon -->\n" +
-                    "    <link rel=\"stylesheet\" type=\"text/css\" href=\"assets/vendor/font-awesome/css/all.min.css\"/>\n" +
-                    "    <!-- Magnific Popup -->\n" +
-                    "    <link rel=\"stylesheet\" type=\"text/css\" href=\"assets/vendor/magnific-popup/magnific-popup.min.css\"/>\n" +
-                    "    <!-- Highlight Syntax -->\n" +
-                    "    <link rel=\"stylesheet\" type=\"text/css\" href=\"assets/vendor/highlight.js/styles/github.css\"/>\n" +
-                    "    <!-- Custom Stylesheet -->\n" +
-                    "    <link rel=\"stylesheet\" type=\"text/css\" href=\"assets/css/stylesheet-landing.css\"/>\n" +
-                    "    <link rel=\"stylesheet\" type=\"text/css\" href=\"assets/css/caroussel.css\"/>\n" +
-                    "\n" +
-                    "    <style>\n" +
-                    "        table { border-collapse: collapse; width: 80%; margin: 20px auto; }\n" +
-                    "        th, td { border: 1px solid #333; padding: 8px; text-align: center; }\n" +
-                    "        th { background: #555; color: #fff; }\n" +
-                    "        td a { text-decoration: none; color: #0066cc; }\n" +
-                    "        td.compatible { background: #cfc; }\n" +
-                    "        td.incompatible { background: #fcc; }\n" +
-                    "        td.na { background: #ccc; }\n" +
-                    "\n" +
-                    "        /* hide text inside the link but keep the element there */\n" +
-                    "        td.disabled a {\n" +
-                    "            color: transparent;          /* hide the text */\n" +
-                    "            text-decoration: none;       /* remove underline */\n" +
-                    "        }\n" +
-                    "\n" +
-                    "    </style>\n" +
-                    "</head>\n"
-            );
+        NStringBuilder prefixText = new NStringBuilder()
+                .println("---")
+                .println("title: ${title}")
+                .println("---")
+                .println("A version-compatibility matrix is provided to help navigate API evolution across Nuts releases.")
+                .println("Each cell in the matrix links to a JAPI-Compliance-Checker report comparing version X to version Y, offering a detailed view of changes and compatibility levels between specific versions.")
+                .println("This makes it easy to assess upgrade paths and understand how APIs evolve over time.");
+        NPath file = context().websiteProjectFolder.resolve("src/include/doc-naf/01-introduction/120-versions.html.md");
 
-            out.println("<body>");
-            out.println("<h1 style=\"text-align:center;\">" + title + "</h1>");
+        boolean showTitle = false;
+        boolean htmlBodyOnly = true;
+        boolean embedIframes = false;
+        boolean linkToIFrames = false;
+        String effectivePrefix = "";
+        if (!prefixText.isBlank()) {
+            effectivePrefix = NMsg.ofV(prefixText.toString(), NMaps.of("title", title)).toString();
+        }
+        try (PrintStream out = file.mkParentDirs().getPrintStream()) {
+            if (!NBlankable.isBlank(effectivePrefix)) {
+                out.println(effectivePrefix);
+            }
+            if (!htmlBodyOnly) {
+                out.println("<!DOCTYPE html>\n" +
+                        "<html lang=\"en\">\n" +
+                        "<head>\n" +
+                        "    <meta charset=\"UTF-8\">\n" +
+                        "    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n" +
+                        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no\">\n" +
+                        "    <link href=\"assets/images/favicon.ico\" rel=\"icon\"/>\n" +
+                        "    <title>" + title + "</title>\n" +
+                        "    <meta name=\"description\" content=\""+title+"\">\n" +
+                        "    <meta name=\"author\" content=\"thevpc\">\n" +
+                        "    <!-- Bootstrap -->\n" +
+                        "    <link rel=\"stylesheet\" type=\"text/css\" href=\"assets/vendor/bootstrap/css/bootstrap.min.css\"/>\n" +
+                        "    <!-- Font Awesome Icon -->\n" +
+                        "    <link rel=\"stylesheet\" type=\"text/css\" href=\"assets/vendor/font-awesome/css/all.min.css\"/>\n" +
+                        "    <!-- Magnific Popup -->\n" +
+                        "    <link rel=\"stylesheet\" type=\"text/css\" href=\"assets/vendor/magnific-popup/magnific-popup.min.css\"/>\n" +
+                        "    <!-- Highlight Syntax -->\n" +
+                        "    <link rel=\"stylesheet\" type=\"text/css\" href=\"assets/vendor/highlight.js/styles/github.css\"/>\n" +
+                        "    <!-- Custom Stylesheet -->\n" +
+                        "    <link rel=\"stylesheet\" type=\"text/css\" href=\"assets/css/stylesheet-landing.css\"/>\n" +
+                        "    <link rel=\"stylesheet\" type=\"text/css\" href=\"assets/css/caroussel.css\"/>\n" +
+                        "\n" +
+                        "    <style>\n" +
+                        "        table { border-collapse: collapse; width: 80%; margin: 20px auto; }\n" +
+                        "        th, td { border: 1px solid #333; padding: 8px; text-align: center; }\n" +
+                        "        th { background: #555; color: #fff; }\n" +
+                        "        td a { text-decoration: none; color: #0066cc; }\n" +
+                        "        td.compatible { background: #cfc; }\n" +
+                        "        td.incompatible { background: #fcc; }\n" +
+                        "        td.na { background: #ccc; }\n" +
+                        "\n" +
+                        "        /* hide text inside the link but keep the element there */\n" +
+                        "        td.disabled a {\n" +
+                        "            color: transparent;          /* hide the text */\n" +
+                        "            text-decoration: none;       /* remove underline */\n" +
+                        "        }\n" +
+                        "\n" +
+                        "    </style>\n" +
+                        "</head>\n"
+                );
+                out.println("<body>");
+            }
+            if (showTitle) {
+                out.println("<h1 style=\"text-align:center;\">" + title + "</h1>");
+            }
             out.println("<table>");
 
             out.println("  <tr>");
@@ -194,7 +226,10 @@ public class CompatRunner extends AbstractRunner {
                         String bg = background(d);
                         String fg = foregroundForBg(bg);
 
-                        out.println(NMsg.ofV("  <td style=\"background:" + bg + ";color:" + fg + "\"><a style=\"color:" + fg + ";text-decoration:none;\" href=\"compat_reports/nuts/${i}_to_${j}/compat_report.html\" target=\"_blank\">${i}→${j} ${comp}</a></td>", v -> {
+                        String urlPattern = embedIframes && linkToIFrames ?
+                                "#nuts_${i}_${j}"
+                                : "compat_reports/nuts/${i}_to_${j}/compat_report.html";
+                        out.println(NMsg.ofV("  <td style=\"background:" + bg + ";color:" + fg + "\"><a style=\"color:" + fg + ";text-decoration:none;\" href=\""+urlPattern+"\" target=\"_blank\">${i}→${j} ${comp}</a></td>", v -> {
                             switch (v) {
                                 case "i":
                                     return allVersionsArray[finalI].toString();
@@ -217,8 +252,35 @@ public class CompatRunner extends AbstractRunner {
                 out.println("  </tr>");
             }
             out.println("</table>");
-            out.println("</body>");
-            out.println("</html>");
+
+            if (embedIframes) {
+                for (int i = 0; i < allVersionsArray.length; i++) {
+                    for (int j = 0; j < allVersionsArray.length; j++) {
+                        if (j > i) {
+                            int finalI = i;
+                            int finalJ = j;
+                            Function<String, Object> ff = new Function<String, Object>() {
+                                @Override
+                                public Object apply(String v) {
+                                    switch (v) {
+                                        case "i":
+                                            return allVersionsArray[finalI].toString();
+                                        case "j":
+                                            return allVersionsArray[finalJ].toString();
+                                    }
+                                    return null;
+                                }
+                            };
+                            out.println(NMsg.ofV("<H2 id=\"nuts_${i}_${j}\">${i}→${j}</H2>", ff));
+                            out.println(NMsg.ofV("<iframe loading=\"lazy\" src=\"compat_reports/nuts/${i}_to_${j}/compat_report.html\" style=\"width: 100%; height: 600px; border: none;\"></iframe>", ff));
+                        }
+                    }
+                }
+            }
+            if (!htmlBodyOnly) {
+                out.println("</body>");
+                out.println("</html>");
+            }
         }
     }
 
