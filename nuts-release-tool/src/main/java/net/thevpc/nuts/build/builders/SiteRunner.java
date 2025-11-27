@@ -11,6 +11,7 @@ import net.thevpc.nuts.build.util.NReleaseUtils;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 
+import net.thevpc.nuts.command.NExecCmd;
 import net.thevpc.nuts.core.NWorkspace;
 import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.io.NPath;
@@ -65,6 +66,15 @@ public class SiteRunner extends AbstractRunner {
         echoV("**** $v (nuts)...", NMaps.of("v", NMsg.ofStyledKeyword("build-nuts-site")));
         runGithubRepository();
         runGithubDocumentationWebsite();
+        runCopyThevpcNetScripts();
+    }
+
+    private void runCopyThevpcNetScripts() {
+        NExecCmd.ofSystem(
+                "rsync", "-avz", "--progress", "-e", "ssh", "--info=progress2", "--human-readable",
+                context().nutsRootFolder+"/scripts/thevpc.net/",
+                        "vpc@thevpc.net:/home/vpc/srv/tomcat-a/domain-webapps/thevpc.net/ROOT/nuts/"
+        ).run();
     }
 
 
