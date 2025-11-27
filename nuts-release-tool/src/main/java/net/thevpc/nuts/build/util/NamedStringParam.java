@@ -63,7 +63,14 @@ public class NamedStringParam {
         if (NBlankable.isBlank(getValue())) {
             String v = context.vars.get(getName());
             if (!NBlankable.isBlank(v)) {
-                setValue(v);
+                if(v.contains("$")){
+                    v=NMsg.ofV(v,context.vars).toString();
+                    if (!NBlankable.isBlank(v)) {
+                        setValue(v);
+                    }
+                }else {
+                    setValue(v);
+                }
             }
         }
         return this;
