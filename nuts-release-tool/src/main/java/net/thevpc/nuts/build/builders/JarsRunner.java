@@ -63,9 +63,9 @@ public class JarsRunner extends AbstractRunner {
 
     @Override
     public void configureAfterOptions() {
-        context().setRemoteTheVpcSshConnexion(
+        context().setRemoteTheVpcSshConnection(
                 NStringUtils.firstNonBlank(NMsg.ofV(
-                        NStringUtils.trim(context().vars.get("PROD_SSH_CONNEXION"))
+                        NStringUtils.trim(context().vars.get("PROD_SSH_CONNECTION"))
                         , context().varMapper()).toString(),context().getRemoteTheVpcSshUser() + "@thevpc.net")
         );
     }
