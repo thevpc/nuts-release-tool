@@ -330,26 +330,26 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
 
     public void remoteCopyFolder(String fromRemote, String toRemote) {
         remoteExec("cp -r " + fromRemote + " " + _parentPath(toRemote));
-        //scp("-r", getRemoteSshConnexion().get() + ":" + fromRemote, getRemoteSshConnexion().get() + ":" + toRemote);
+        //scp("-r", getRemoteSshConnection().get() + ":" + fromRemote, getRemoteSshConnection().get() + ":" + toRemote);
     }
 
     public void remoteCopyFolder(NPath fromRemote, NPath toRemote) {
         remoteExec("cp -r " + fromRemote + " " + _parentPath(toRemote.toString()));
-        //scp("-r", getRemoteSshConnexion().get() + ":" + fromRemote, getRemoteSshConnexion().get() + ":" + toRemote);
+        //scp("-r", getRemoteSshConnection().get() + ":" + fromRemote, getRemoteSshConnection().get() + ":" + toRemote);
     }
 
     public void remoteCopyFile(String fromRemote, String toRemote) {
         remoteExec("cp " + fromRemote + " " + toRemote);
-        //scp(getRemoteSshConnexion().get() + ":" + fromRemote, getRemoteSshConnexion().get() + ":" + toRemote);
+        //scp(getRemoteSshConnection().get() + ":" + fromRemote, getRemoteSshConnection().get() + ":" + toRemote);
     }
 
     public void remoteCopyFile(NPath fromRemote, NPath toRemote) {
         remoteExec("cp " + fromRemote + " " + toRemote);
-        //scp(getRemoteSshConnexion().get() + ":" + fromRemote, getRemoteSshConnexion().get() + ":" + toRemote);
+        //scp(getRemoteSshConnection().get() + ":" + fromRemote, getRemoteSshConnection().get() + ":" + toRemote);
     }
 
     public void remoteExec(String command) {
-        ssh(context().getRemoteTheVpcSshConnexion().get(), command);
+        ssh(context().getRemoteTheVpcSshConnection().get(), command);
     }
 
     public void remoteKill(long pid) {
@@ -357,7 +357,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
     }
 
     public JpsResult[] remoteJps() {
-        String jps = sshAsString(context().getRemoteTheVpcSshConnexion().get(), "jps", "-lmv");
+        String jps = sshAsString(context().getRemoteTheVpcSshConnection().get(), "jps", "-lmv");
         String[] rows = jps.split("\n");
         List<JpsResult> results = new ArrayList<>();
         for (String row : rows) {
@@ -456,7 +456,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
                         remoteMkdirs(rto);
                         rto = NPath.of(rto).getParent().toString();
                     }
-                    scpOrRsync(p.toString(), context().getRemoteTheVpcSshConnexion().get() + ":" + rto);
+                    scpOrRsync(p.toString(), context().getRemoteTheVpcSshConnection().get() + ":" + rto);
                 }
             } else {
                 String rto = to;
@@ -466,8 +466,8 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
                 }
 //                log(NMsg.ofC("##upload## %s to %s",
 //                        NMsg.ofStyled(rfrom0, NTextStyle.path()),
-//                        NMsg.ofStyled(connexion() + ":" + rto, NTextStyle.path())));
-                scpOrRsync(rfrom0, context().getRemoteTheVpcSshConnexion().get() + ":" + rto);
+//                        NMsg.ofStyled(connection() + ":" + rto, NTextStyle.path())));
+                scpOrRsync(rfrom0, context().getRemoteTheVpcSshConnection().get() + ":" + rto);
             }
         } else {
             String rto = NPath.of(to).toString();
@@ -475,7 +475,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
                 remoteMkdirs(rto);
                 rto = NPath.of(rto).getParent().toString();
             }
-            scpOrRsync(rfrom, context().getRemoteTheVpcSshConnexion().get() + ":" + rto);
+            scpOrRsync(rfrom, context().getRemoteTheVpcSshConnection().get() + ":" + rto);
         }
     }
 
@@ -495,7 +495,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
         NExecCmd.of().system()
                 .addCommand(
                         "ssh",
-                        context().getRemoteTheVpcSshConnexion().get(),
+                        context().getRemoteTheVpcSshConnection().get(),
                         NCmdLineFormat.ofPlain(NCmdLine.of(command)).toString()
                 )
                 .failFast()
