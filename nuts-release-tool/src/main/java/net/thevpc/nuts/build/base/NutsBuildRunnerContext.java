@@ -11,7 +11,6 @@ import java.util.function.Function;
 
 import net.thevpc.nuts.elem.*;
 import net.thevpc.nuts.io.NOut;
-import net.thevpc.nuts.build.util.ConfReader;
 import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.io.NPath;
 import net.thevpc.nuts.util.NFunction;
@@ -39,7 +38,7 @@ public class NutsBuildRunnerContext {
     public String nutsLtsApiVersion = null;
     public String nutsLtsAppVersion = null;
     public String nutsLtsRuntimeVersion = null;
-    private String remoteTheVpcSshConnexion;
+    private String remoteTheVpcSshConnection;
     public NElement confRoot;
 
     public boolean verbose = false;
@@ -53,8 +52,8 @@ public class NutsBuildRunnerContext {
         this.remoteTheVpcSshHost = remoteTheVpcSshHost;
     }
 
-    public NOptional<String> getRemoteTheVpcSshConnexion() {
-        return NOptional.of(remoteTheVpcSshConnexion).orElseUse(
+    public NOptional<String> getRemoteTheVpcSshConnection() {
+        return NOptional.of(remoteTheVpcSshConnection).orElseUse(
                 () -> {
                     String s = getRemoteTheVpcSshHost().orElse(System.getProperty("user.home"))
                             + ":"
@@ -64,8 +63,8 @@ public class NutsBuildRunnerContext {
         );
     }
 
-    public void setRemoteTheVpcSshConnexion(String remoteTheVpcSshConnexion) {
-        this.remoteTheVpcSshConnexion = remoteTheVpcSshConnexion;
+    public void setRemoteTheVpcSshConnection(String remoteTheVpcSshConnection) {
+        this.remoteTheVpcSshConnection = remoteTheVpcSshConnection;
     }
 
     public String getRemoteTheVpcSshUser() {
