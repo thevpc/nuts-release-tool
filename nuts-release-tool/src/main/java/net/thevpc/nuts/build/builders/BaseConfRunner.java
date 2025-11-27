@@ -23,8 +23,7 @@ import java.util.logging.Level;
 public class BaseConfRunner extends AbstractRunner {
 
 
-    public static final String NUTS_RELEASE_CONF_SIMPLE = "nuts-release.conf";
-    public static final String NUTS_RELEASE_CONF_TSON = "nuts-release.tson";
+    public static final String NUTS_RELEASE_CONF_TSON = "nuts-release-tool.tson";
 
     @Override
     public boolean configureFirst(NCmdLine cmdLine) {
