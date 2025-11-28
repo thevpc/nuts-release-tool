@@ -4,13 +4,18 @@
  */
 package net.thevpc.nuts.build.builders;
 
+import net.thevpc.nuts.Nuts;
+import net.thevpc.nuts.artifact.NVersion;
 import net.thevpc.nuts.build.util.*;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 
 import net.thevpc.nuts.core.NSession;
+import net.thevpc.nuts.core.NWorkspace;
 import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.io.NPath;
+import net.thevpc.nuts.io.NPathType;
+import net.thevpc.nuts.net.NConnectionString;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -87,7 +92,12 @@ public class InstallerRunner extends AbstractRunner {
         r.setCopyright("(c) 2018-"+ LocalDate.now().getYear() +" thevpc");
         r.setIcons(Arrays.asList(context().nutsRootFolder.resolve("documentation/media/nuts-icon.icns")));
 
-        NPath sharedDistFolder = context().nutsRootFolder.resolve("installers/nuts-release-tool").resolve("dist");
+        NPath sharedDistFolder = context().nutsRootFolder.resolve("installers/dist").resolve(Nuts.getVersion().toString());
+        NPath thevpcNutsVer = remoteTheVpcNutsPath().resolve(Nuts.getVersion().toString());
+
+
+        NPath thevpcNutsVerWithSsh = NPath.of(NConnectionString.of(context().getRemoteTheVpcSshConnection().get()).builder().setProtocol("ssh").setPath(thevpcNutsVer.toString()).build());
+        NPathType type = thevpcNutsVerWithSsh.type();
         if (buildInstaller) {
             r.setSupported(NativeBuilder.PackageType.PORTABLE);
             if(buildNative){
@@ -99,8 +109,9 @@ public class InstallerRunner extends AbstractRunner {
             r.setProfilingArgs(new String[0]);
             r.build();
             if (context().publish) {
+                thevpcNutsVerWithSsh.mkdirs();
                 for (NPath nPath : r.getGeneratedFiles()) {
-                    upload(nPath, remoteTheVpcNutsPath().resolve(nPath.getName()).toString());
+                    upload(nPath, thevpcNutsVer.resolve(nPath.getName()).toString());
                 }
             }
         }
@@ -111,13 +122,14 @@ public class InstallerRunner extends AbstractRunner {
                 r.addSupported(NativeBuilder.PackageType.NATIVE,NativeBuilder.PackageType.BIN,NativeBuilder.PackageType.JRE_BUNDLE);
             }
             r.setMainClass("net.thevpc.nuts.NutsApp");
-            r.setProjectFolder(context().nutsRootFolder.resolve("core/nuts-app-full"), null, "nuts-app-full-$version.jar");
+            r.setProjectFolder(context().nutsRootFolder.resolve("core/nuts-app-full"), null, "nuts-app-full-"+ NWorkspace.of().getRuntimeId().getVersion() +".jar");
             r.setDist(sharedDistFolder);
             r.setProfilingArgs(new String[]{"--sandbox","--verbose"});
             r.build();
             if (context().publish) {
+                thevpcNutsVerWithSsh.mkdirs();
                 for (NPath nPath : r.getGeneratedFiles()) {
-                    upload(nPath, remoteTheVpcNutsPath().resolve(nPath.getName()).toString());
+                    upload(nPath, thevpcNutsVer.resolve(nPath.getName()).toString());
                 }
             }
         }
