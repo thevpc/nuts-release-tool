@@ -407,7 +407,7 @@ public class NativeBuilder {
     private List<NPath> createDistNativePackrWithJava(BinPlatform platform) {
         echo("**** [$id] create $v $p (Packr)...",
                 NMaps.of("id",appId,
-                        "v", NMsg.ofStyledKeyword("bin-with-java")
+                        "v", NMsg.ofStyledKeyword("with-java")
                         , "p", platform
                 )
         );
