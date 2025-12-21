@@ -1,10 +1,10 @@
 package net.thevpc.nuts.build.util;
 
 import net.thevpc.nuts.artifact.*;
-import net.thevpc.nuts.command.NExecCmd;
-import net.thevpc.nuts.core.NWorkspace;
+import net.thevpc.nuts.command.NExec;
 import net.thevpc.nuts.io.NOut;
 import net.thevpc.nuts.io.NPath;
+import net.thevpc.nuts.platform.NEnv;
 import net.thevpc.nuts.text.NMsg;
 import net.thevpc.nuts.text.NMsgParam;
 import net.thevpc.nuts.util.NMaps;
@@ -162,7 +162,7 @@ public class NativeBuilder {
 //  cd $NUTS_ROOT_BASE/installers/nuts-installer/src/dist
         ensureRegularFile(graalvmHome + "/bin/java", "graalvmHome");
         ensureRegularFile(graalvmHome + "/bin/native-image", "graalvmHome");
-        NExecCmd.of().system()
+        NExec.of().system()
                 .setEnv("JAVA_HOME",graalvmHome)
                 .setDirectory(evalSrcDist())
                 .addCommand(graalvmHome + "/bin/java")
@@ -175,7 +175,7 @@ public class NativeBuilder {
                 .run();
 
         NPath f = rootDistLinux64Bin.resolve(evalName(platform, null, null));
-        NExecCmd.of().system()
+        NExec.of().system()
                 .setEnv("JAVA_HOME",graalvmHome)
                 .setDirectory(evalSrcDist())
                 .addCommand(graalvmHome + "/bin/native-image")
@@ -203,7 +203,7 @@ public class NativeBuilder {
 
     private NPath zipFolder(NPath folder, BinPlatform platform, String discriminator) {
         NPath fzip = folder.resolveSibling(evalName(platform, discriminator, ".zip"));
-        NExecCmd.of().system()
+        NExec.of().system()
                 .setDirectory(folder.getParent())
                 .addCommand("zip")
                 .addCommand("-r")
@@ -215,7 +215,7 @@ public class NativeBuilder {
     }
 
     private BinPlatform currentPlatform() {
-        NWorkspace e = NWorkspace.of();
+        NEnv e = NEnv.of();
         switch (e.getOsFamily()) {
             case UNIX:
             case LINUX: {
@@ -248,7 +248,7 @@ public class NativeBuilder {
     }
 
     private BinPlatform evalCurrentBinPlatform() {
-        NWorkspace z = NWorkspace.of();
+        NEnv z = NEnv.of();
         switch (z.getOsFamily()) {
             case LINUX: {
                 switch (z.getArchFamily()) {
@@ -288,7 +288,7 @@ public class NativeBuilder {
         if (targetFolder.isDirectory()) {
             targetFolder.deleteTree();
         }
-        NExecCmd.of().system()
+        NExec.of().system()
                 .addCommand(jpackageHome + "/bin/jpackage")
                 .addCommand("--name")
                 .addCommand(appName)
@@ -321,7 +321,7 @@ public class NativeBuilder {
 
     private NPath installJar2App() {
         NPath jar2appBase = NPath.ofTempFolder("jar2app");
-        NExecCmd.of().system()
+        NExec.of().system()
                 .setDirectory(jar2appBase)
                 .addCommand("git", "clone")
                 .addCommand("https://github.com/Jorl17/jar2app.git")
@@ -337,8 +337,8 @@ public class NativeBuilder {
 //                jar2appFolderBin
 //        );
 //        jar2appFolderBin=jar2appFolderBin.setUserTemporary(true);
-        NExecCmd.of().system().setDirectory(jar2appFolderSrc).failFast().addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app_basefiles").toString()).run();
-        NExecCmd.of().system().setDirectory(jar2appFolderSrc).failFast().addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app").toString()).run();
+        NExec.of().system().setDirectory(jar2appFolderSrc).failFast().addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app_basefiles").toString()).run();
+        NExec.of().system().setDirectory(jar2appFolderSrc).failFast().addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app").toString()).run();
         return jar2appFolderSrc;
     }
 
@@ -354,7 +354,7 @@ public class NativeBuilder {
             target.deleteTree();
         }
         NPath jar2AppRoot = installJar2App();
-        NExecCmd.of().system()
+        NExec.of().system()
                 .setDirectory(jar2AppRoot)
                 .addCommand("python3")
                 .addCommand("./jar2app")
@@ -446,7 +446,7 @@ public class NativeBuilder {
             NPath.of("https://github.com/libgdx/packr/releases/download/4.0.0/packr-all-4.0.0.jar")
                     .copyTo(packrbin);
         }
-        NExecCmd.of().system()
+        NExec.of().system()
                 .addCommand("java")
                 .addCommand("-jar")
                 .addCommand(packrbin)
