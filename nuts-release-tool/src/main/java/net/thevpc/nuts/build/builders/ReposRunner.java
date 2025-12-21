@@ -7,7 +7,7 @@ package net.thevpc.nuts.build.builders;
 import net.thevpc.nuts.build.util.*;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
-import net.thevpc.nuts.command.NExecCmd;
+import net.thevpc.nuts.command.NExec;
 import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.util.NMaps;
 import net.thevpc.nuts.text.NMsg;
@@ -57,7 +57,7 @@ public class ReposRunner extends AbstractRunner {
     public void run() {
         if (repoPreview) {
             echoV("**** $v (nuts settings update stats)...", NMaps.of("v", NMsg.ofStyledKeyword("build-nuts-preview")));
-            NExecCmd.of()
+            NExec.of()
                     .addCommand("settings", "update", "stats")
                     .addCommand(context().nutsRootFolder.resolve("../nuts-repos/nuts-preview"))
                     .failFast()
@@ -65,7 +65,7 @@ public class ReposRunner extends AbstractRunner {
         }
         if (repoPublic) {
             echoV("**** $v (nuts settings update stats)...", NMaps.of("v", NMsg.ofStyledKeyword("build-nuts-public")));
-            NExecCmd.of()
+            NExec.of()
                     .addCommand("settings", "update", "stats")
                     .addCommand(context().nutsRootFolder.resolve("../nuts-repos/nuts-public"))
                     .failFast()
