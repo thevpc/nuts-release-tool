@@ -4,7 +4,7 @@ import net.thevpc.nuts.app.NApp;
 import net.thevpc.nuts.artifact.NId;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
-import net.thevpc.nuts.command.NExecCmd;
+import net.thevpc.nuts.command.NExec;
 import net.thevpc.nuts.core.NSession;
 import net.thevpc.nuts.io.NOut;
 import net.thevpc.nuts.text.NCmdLineFormat;
@@ -171,7 +171,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
         traceCmd(cmd);
         //}
 //        String out =
-        NExecCmd.of()
+        NExec.of()
                 .addCommand(cmd)
                 .failFast()
                 .system()
@@ -188,7 +188,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
         if (session.isDry() || session.isTrace()) {
             traceCmd(cmd);
         }
-        return NExecCmd.of()
+        return NExec.of()
                 .addCommand(cmd)
                 .failFast()
                 .system()
@@ -492,7 +492,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
     }
 
     public void rexec(String... command) {
-        NExecCmd.of().system()
+        NExec.of().system()
                 .addCommand(
                         "ssh",
                         context().getRemoteTheVpcSshConnection().get(),
