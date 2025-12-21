@@ -11,7 +11,7 @@ import net.thevpc.nuts.build.util.NReleaseUtils;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 
-import net.thevpc.nuts.command.NExecCmd;
+import net.thevpc.nuts.command.NExec;
 import net.thevpc.nuts.core.NWorkspace;
 import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.io.NPath;
@@ -70,7 +70,7 @@ public class SiteRunner extends AbstractRunner {
     }
 
     private void runCopyThevpcNetScripts() {
-        NExecCmd.ofSystem(
+        NExec.ofSystem(
                 "rsync", "-avz", "--progress", "-e", "ssh", "--info=progress2", "--human-readable",
                 context().nutsRootFolder+"/scripts/thevpc.net/",
                         "vpc@thevpc.net:/home/vpc/srv/tomcat-a/domain-webapps/thevpc.net/ROOT/nuts/"
