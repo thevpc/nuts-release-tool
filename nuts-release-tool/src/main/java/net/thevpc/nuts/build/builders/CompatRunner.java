@@ -8,10 +8,9 @@ import net.thevpc.nuts.Nuts;
 import net.thevpc.nuts.artifact.NVersion;
 import net.thevpc.nuts.build.util.AbstractRunner;
 import net.thevpc.nuts.build.util.NReleaseUtils;
-import net.thevpc.nuts.build.util.NativeBuilder;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
-import net.thevpc.nuts.command.NExecCmd;
+import net.thevpc.nuts.command.NExec;
 import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.io.NIOException;
 import net.thevpc.nuts.io.NPath;
@@ -328,7 +327,7 @@ public class CompatRunner extends AbstractRunner {
         }
         echoV("**** $v $s1→$s2 (nuts)...", NMaps.of("v", NMsg.ofStyledKeyword("build-compat"), "s1", from, "s2", to));
         // /documentation/website/src/main/
-        NExecCmd e = NExecCmd.ofSystem(
+        NExec e = NExec.ofSystem(
                         "/usr/bin/japi-compliance-checker",
                         NPath.ofUserHome().resolve(NMsg.ofV(".m2/repository/net/thevpc/nuts/nuts/$v1/nuts-$v1.jar", v -> from.toString()).toString()).toString(),
                         NPath.ofUserHome().resolve(NMsg.ofV(".m2/repository/net/thevpc/nuts/nuts/$v1/nuts-$v1.jar", v -> to.toString()).toString()).toString()
