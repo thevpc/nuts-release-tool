@@ -496,7 +496,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
                 .addCommand(
                         "ssh",
                         context().getRemoteTheVpcSshConnection().get(),
-                        NCmdLineFormat.ofPlain(NCmdLine.of(command)).toString()
+                        NCmdLineFormat.of().formatPlain(NCmdLine.of(command))
                 )
                 .failFast()
                 .run();
