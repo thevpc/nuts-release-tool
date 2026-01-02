@@ -53,7 +53,7 @@ public class NutsBuildRunnerContext {
     }
 
     public NOptional<String> getRemoteTheVpcSshConnection() {
-        return NOptional.of(remoteTheVpcSshConnection).orElseUse(
+        return NOptional.of(remoteTheVpcSshConnection).orElseGetOptionalFrom(
                 () -> {
                     String s = getRemoteTheVpcSshHost().orElse(System.getProperty("user.home"))
                             + ":"
