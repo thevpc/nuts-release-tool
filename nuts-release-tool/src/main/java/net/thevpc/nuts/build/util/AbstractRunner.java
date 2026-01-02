@@ -7,7 +7,7 @@ import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.command.NExec;
 import net.thevpc.nuts.core.NSession;
 import net.thevpc.nuts.io.NOut;
-import net.thevpc.nuts.text.NCmdLineFormat;
+import net.thevpc.nuts.text.NCmdLineWriter;
 import net.thevpc.nuts.io.NPath;
 import net.thevpc.nuts.io.NPathOption;
 import net.thevpc.nuts.util.NArrays;
@@ -496,7 +496,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
                 .addCommand(
                         "ssh",
                         context().getRemoteTheVpcSshConnection().get(),
-                        NCmdLineFormat.of().formatPlain(NCmdLine.of(command))
+                        NCmdLineWriter.of().formatPlain(NCmdLine.of(command))
                 )
                 .failFast()
                 .run();
