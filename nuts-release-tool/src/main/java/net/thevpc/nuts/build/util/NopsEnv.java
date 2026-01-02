@@ -1,7 +1,7 @@
 package net.thevpc.nuts.build.util;
 
 import net.thevpc.nuts.elem.NElement;
-import net.thevpc.nuts.elem.NElementParser;
+import net.thevpc.nuts.elem.NElementReader;
 import net.thevpc.nuts.elem.NPairElement;
 import net.thevpc.nuts.io.NPath;
 import net.thevpc.nuts.platform.NStoreType;
@@ -27,7 +27,7 @@ public class NopsEnv {
                 }
                 confs.sort(Comparator.comparing(x -> x.getName()));
                 for (NPath conf : confs) {
-                    NElement parsed = NElementParser.ofTson().parse(conf);
+                    NElement parsed = NElementReader.ofTson().read(conf);
                     class InternalDoer {
                         void processEnv(NElement env){
                             for (NElement nElement : env.asObject().get().children()) {
