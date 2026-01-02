@@ -124,7 +124,7 @@ public class NutsBuildRunnerContext {
     public void loadConfig(NCmdLine cmdLine) {
         if (this.confFileTson.isRegularFile()) {
             NOut.println(NMsg.ofC("loadConfig %s", this.confFileTson));
-            confRoot = NElementParser.ofTson().parse(confFileTson);
+            confRoot = NElementReader.ofTson().read(confFileTson);
 
         }
     }
