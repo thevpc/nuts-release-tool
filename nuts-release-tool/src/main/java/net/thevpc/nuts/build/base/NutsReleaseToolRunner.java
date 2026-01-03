@@ -1,6 +1,7 @@
 package net.thevpc.nuts.build.base;
 
 import net.thevpc.nuts.app.NApp;
+import net.thevpc.nuts.core.NSession;
 import net.thevpc.nuts.io.NOut;
 import net.thevpc.nuts.build.util.AbstractRunner;
 import net.thevpc.nuts.cmdline.NCmdLine;
@@ -35,10 +36,10 @@ public class NutsReleaseToolRunner {
     }
 
     public NutsBuildRunnerContext context() {
-        NutsBuildRunnerContext s = (NutsBuildRunnerContext) NApp.of().getProperty(NutsBuildRunnerContext.class.getName(), NScopeType.SESSION).orNull();
+        NutsBuildRunnerContext s = NSession.of().getProperty(NutsBuildRunnerContext.class).orNull();
         if (s == null) {
             s = new NutsBuildRunnerContext();
-            NApp.of().setProperty(NutsBuildRunnerContext.class.getName(), NScopeType.SESSION, s);
+            NSession.of().setProperty(NutsBuildRunnerContext.class, s);
         }
         return s;
     }
