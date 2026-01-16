@@ -3,10 +3,7 @@ package net.thevpc.nuts.build.util;
 import net.thevpc.nuts.artifact.NDescriptor;
 import net.thevpc.nuts.artifact.NDescriptorParser;
 import net.thevpc.nuts.artifact.NDescriptorStyle;
-import net.thevpc.nuts.elem.NElement;
-import net.thevpc.nuts.elem.NElementType;
-import net.thevpc.nuts.elem.NOperatorElement;
-import net.thevpc.nuts.elem.NPairElement;
+import net.thevpc.nuts.elem.*;
 import net.thevpc.nuts.util.NIllegalArgumentException;
 import net.thevpc.nuts.io.NPath;
 import net.thevpc.nuts.text.NMsg;
@@ -31,12 +28,12 @@ public class NReleaseUtils {
                     String key = p.key().asStringValue().get();
                     pars.put(key, p.value());
                 } else if (
-                        c.isBinaryOperator(NElementType.OP_EQ)
-                                || c.isBinaryOperator(NElementType.OP_COLON_EQ)
+                        c.isBinaryOperator(NOperatorSymbol.EQ)
+                                || c.isBinaryOperator(NOperatorSymbol.COLON_EQ)
                 ) {
-                    NOperatorElement o = c.asOperator().get();
-                    NElement f = o.first().get();
-                    NElement s = o.second().get();
+                    NBinaryOperatorElement o = c.asBinaryOperator().get();
+                    NElement f = o.first();
+                    NElement s = o.second();
                     if (f.isAnyString()) {
                         pars.put(f.asStringValue().get(), s);
                     }
