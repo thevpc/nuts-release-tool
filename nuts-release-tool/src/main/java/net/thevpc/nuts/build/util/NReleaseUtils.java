@@ -32,8 +32,8 @@ public class NReleaseUtils {
                                 || c.isBinaryOperator(NOperatorSymbol.COLON_EQ)
                 ) {
                     NBinaryOperatorElement o = c.asBinaryOperator().get();
-                    NElement f = o.first();
-                    NElement s = o.second();
+                    NElement f = o.firstOperand();
+                    NElement s = o.secondOperand();
                     if (f.isAnyString()) {
                         pars.put(f.asStringValue().get(), s);
                     }
