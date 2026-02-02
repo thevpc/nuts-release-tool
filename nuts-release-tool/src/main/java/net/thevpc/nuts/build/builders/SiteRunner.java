@@ -88,9 +88,9 @@ public class SiteRunner extends AbstractRunner {
         vars.putAll(context().vars);
         vars.put("buildTime", new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date()));
         {//stable
-            NAssert.requireNonBlank(context().nutsLtsAppVersion, "nutsStableVersion");
-            NAssert.requireNonBlank(context().nutsLtsApiVersion, "nutsApiStableVersion");
-            NAssert.requireNonBlank(context().nutsLtsRuntimeVersion, "runtimeStableVersion");
+            NAssert.requireNamedNonBlank(context().nutsLtsAppVersion, "nutsStableVersion");
+            NAssert.requireNamedNonBlank(context().nutsLtsApiVersion, "nutsApiStableVersion");
+            NAssert.requireNamedNonBlank(context().nutsLtsRuntimeVersion, "runtimeStableVersion");
 
             NId stableApiId = NWorkspace.of().getApiId().builder().setVersion(context().nutsLtsApiVersion).build();
             NId stableAppId = NWorkspace.of().getAppId().builder().setVersion(context().nutsLtsAppVersion).build();
