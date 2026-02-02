@@ -460,7 +460,7 @@ public class NativeBuilder {
                 .addCommand("--classpath")
                 .addCommand(evalSrcDistJar())
                 .addCommand("--mainclass")
-                .addCommand(NAssert.requireNonBlank(mainClass, "mainClass"))
+                .addCommand(NAssert.requireNamedNonBlank(mainClass, "mainClass"))
                 .addCommand("--vmargs")
                 .addCommand("Xmx1G")
                 .addCommand("--output")
