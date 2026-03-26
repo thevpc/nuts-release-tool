@@ -1,5 +1,6 @@
 package net.thevpc.nuts.build.util;
 
+import net.thevpc.nuts.core.NStoreKey;
 import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.elem.NElementReader;
 import net.thevpc.nuts.elem.NPairElement;
@@ -14,7 +15,7 @@ public class NopsEnv {
         for (NPath p : new NPath[]{
                 NPath.ofUserHome().resolve("env-world/env/_install/"),
                 NPath.ofUserHome().resolve("env-world/env/"),
-                NPath.ofUserStore(NStoreType.CONF).resolve("nops"),
+                NPath.of(NStoreKey.ofUser(NStoreType.CONF)).resolve("nops"),
                 NPath.ofUserHome()
         }) {
             p = p.resolve(".nops.tson");
