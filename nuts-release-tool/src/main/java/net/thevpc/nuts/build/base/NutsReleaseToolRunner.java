@@ -1,12 +1,10 @@
 package net.thevpc.nuts.build.base;
 
-import net.thevpc.nuts.app.NApp;
 import net.thevpc.nuts.core.NSession;
 import net.thevpc.nuts.io.NOut;
 import net.thevpc.nuts.build.util.AbstractRunner;
 import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.cmdline.NCmdLineConfigurable;
-import net.thevpc.nuts.spi.NScopeType;
 import net.thevpc.nuts.time.NChronometer;
 import net.thevpc.nuts.text.NMsg;
 
@@ -46,7 +44,7 @@ public class NutsReleaseToolRunner {
 
 
     public void run(NCmdLine args) {
-        NChronometer chrono = NChronometer.startNow();
+        NChronometer chrono = NChronometer.of();
         NOut.println("##nuts-release-tool## started");
         configure(args);
         for (AbstractRunner runner : runners) {
