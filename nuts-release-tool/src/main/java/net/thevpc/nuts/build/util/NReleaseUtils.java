@@ -10,6 +10,7 @@ import net.thevpc.nuts.text.NMsg;
 import net.thevpc.nuts.util.NOptional;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NReleaseUtils {
@@ -19,25 +20,34 @@ public class NReleaseUtils {
         }
     }
 
+    public static Map<String, NElement> asNamedPairsFlat(List<NElement> elems) {
+        LinkedHashMap<String, NElement> pars = new LinkedHashMap<>();
+        for (NElement c : elems) {
+            if (c.isNamedPair()) {
+                NPairElement p = c.asPair().get();
+                String key = p.key().asStringValue().get();
+                pars.put(key, p.value());
+            } else if (
+                    c.isBinaryOperator(NOperatorSymbol.EQ)
+                            || c.isBinaryOperator(NOperatorSymbol.COLON_EQ)
+            ) {
+                NBinaryOperatorElement o = c.asBinaryOperator().get();
+                NElement f = o.firstOperand();
+                NElement s = o.secondOperand();
+                if (f.isAnyString()) {
+                    pars.put(f.asStringValue().get(), s);
+                }
+            }
+        }
+        return pars;
+    }
     public static Map<String, NElement> asNamedPairs(NElement elems) {
         LinkedHashMap<String, NElement> pars = new LinkedHashMap<>();
-        if (elems != null && elems.asObject().isPresent()) {
-            for (NElement c : elems.asObject().get().children()) {
-                if (c.isNamedPair()) {
-                    NPairElement p = c.asPair().get();
-                    String key = p.key().asStringValue().get();
-                    pars.put(key, p.value());
-                } else if (
-                        c.isBinaryOperator(NOperatorSymbol.EQ)
-                                || c.isBinaryOperator(NOperatorSymbol.COLON_EQ)
-                ) {
-                    NBinaryOperatorElement o = c.asBinaryOperator().get();
-                    NElement f = o.firstOperand();
-                    NElement s = o.secondOperand();
-                    if (f.isAnyString()) {
-                        pars.put(f.asStringValue().get(), s);
-                    }
-                }
+        if (elems != null) {
+            if(elems.asObject().isPresent()) {
+                pars.putAll(asNamedPairsFlat(elems.asObject().get().children()));
+            }else if(elems.asFragment().isPresent()){
+                pars.putAll(asNamedPairsFlat(elems.asFragment().get().children()));
             }
         }
         return  pars;

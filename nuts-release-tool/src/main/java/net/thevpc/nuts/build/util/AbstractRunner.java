@@ -1,6 +1,5 @@
 package net.thevpc.nuts.build.util;
 
-import net.thevpc.nuts.app.NApp;
 import net.thevpc.nuts.artifact.NId;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
@@ -22,7 +21,6 @@ import java.util.*;
 
 import net.thevpc.nuts.build.base.NutsBuildRunnerContext;
 import net.thevpc.nuts.cmdline.NCmdLineConfigurable;
-import net.thevpc.nuts.spi.NScopeType;
 
 public abstract class AbstractRunner implements NCmdLineConfigurable {
 
@@ -387,21 +385,27 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
     }
 
     protected NPath remoteThevpcMavenPath() {
-        return NPath.of(context().home + "/srv/maven-thevpc/");
+        String REMOTE_MAVEN_THEVPC_DEPLOY_PATH=context().getVar("REMOTE_MAVEN_THEVPC_DEPLOY_PATH").get();
+        if(!REMOTE_MAVEN_THEVPC_DEPLOY_PATH.endsWith("/")){
+            REMOTE_MAVEN_THEVPC_DEPLOY_PATH+="/";
+        }
+        return NPath.of(REMOTE_MAVEN_THEVPC_DEPLOY_PATH);
     }
 
     protected NPath remoteTheVpcNutsPath() {
-//        return NPath.of(context().home + "/srv/tomcat-a/webapps-thevpc/ROOT/nuts/", session);
-        return NPath.of(context().home + "/srv/tomcat-a/domain-webapps/thevpc.net/ROOT/nuts/");
+        String REMOTE_NUTS_THEVPC_DEPLOY_PATH=context().getVar("REMOTE_NUTS_THEVPC_DEPLOY_PATH").get();
+        if(!REMOTE_NUTS_THEVPC_DEPLOY_PATH.endsWith("/")){
+            REMOTE_NUTS_THEVPC_DEPLOY_PATH+="/";
+        }
+        return NPath.of(REMOTE_NUTS_THEVPC_DEPLOY_PATH);
     }
 
     protected NPath localMvn() {
         return NPath.of(Mvn.localMaven());
     }
 
-    protected NPath removeMvn() {
-        String remoteUser = "vpc";
-        return NPath.of("/home/" + remoteUser + "/.m2/repository");
+    protected NPath remoteMvn() {
+        return NPath.of("/home/" + context().getRemoteTheVpcSshUser() + "/.m2/repository");
     }
 
     public void pushIdFiles(String... ids) {

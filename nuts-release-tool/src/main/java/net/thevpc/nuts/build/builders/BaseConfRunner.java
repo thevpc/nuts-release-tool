@@ -55,7 +55,7 @@ public class BaseConfRunner extends AbstractRunner {
         context().repositoryProjectFolder = context().nutsRootFolder.resolve("documentation/repo");
         context().setVar("root", context().nutsRootFolder.toString());
 
-        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot.asObject().orNull()).entrySet()) {
+        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot).entrySet()) {
             switch (e.getKey()) {
                 case "trace": {
                     context().trace=e.getValue().asBooleanValue().orElse(false);
@@ -79,11 +79,14 @@ public class BaseConfRunner extends AbstractRunner {
                     }
                     break;
                 }
-            }
-        }
-        if (context().confRoot.asObject().isPresent()) {
-            for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot.asObject().get().get("vars").orNull()).entrySet()) {
-                context().vars.put(e.getKey(), e.getValue().asStringValue().get());
+                case "vars": {
+                    if(e.getValue().asObject().isPresent()) {
+                        for (Map.Entry<String, NElement> ee : NReleaseUtils.asNamedPairs(e.getValue()).entrySet()) {
+                            context().vars.put(ee.getKey(), ee.getValue().asStringValue().get());
+                        }
+                    }
+                    break;
+                }
             }
         }
     }

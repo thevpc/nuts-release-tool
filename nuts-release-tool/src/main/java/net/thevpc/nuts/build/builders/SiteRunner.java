@@ -40,7 +40,7 @@ public class SiteRunner extends AbstractRunner {
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
-        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot.asObject().orNull()).entrySet()) {
+        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot).entrySet()) {
             switch (e.getKey()) {
                 case "build-site": {
                     context().buildSite=e.getValue().asBooleanValue().orElse(false);
@@ -70,10 +70,16 @@ public class SiteRunner extends AbstractRunner {
     }
 
     private void runCopyThevpcNetScripts() {
+        String REMOTE_NUTS_THEVPC_DEPLOY_PATH=context().getVar("REMOTE_NUTS_THEVPC_DEPLOY_PATH").get();
+        if(!REMOTE_NUTS_THEVPC_DEPLOY_PATH.endsWith("/")){
+            REMOTE_NUTS_THEVPC_DEPLOY_PATH+="/";
+        }
+
+
         NExec.ofSystem(
                 "rsync", "-avz", "--progress", "-e", "ssh", "--info=progress2", "--human-readable",
                 context().nutsRootFolder+"/scripts/thevpc.net/",
-                        "vpc@thevpc.net:/home/vpc/srv/tomcat-a/domain-webapps/thevpc.net/ROOT/nuts/"
+                context().getRemoteTheVpcSshUser()+"@"+context().getRemoteTheVpcSshHost().get()+":"+REMOTE_NUTS_THEVPC_DEPLOY_PATH
         ).run();
     }
 

@@ -5,9 +5,7 @@ import net.thevpc.nuts.build.util.AbstractRunner;
 import net.thevpc.nuts.build.util.NReleaseUtils;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
-import net.thevpc.nuts.core.NWorkspace;
 import net.thevpc.nuts.elem.NElement;
-import net.thevpc.nuts.io.NPath;
 import net.thevpc.nuts.text.NMsg;
 import net.thevpc.nuts.util.*;
 
@@ -28,7 +26,7 @@ public class JarsRunner extends AbstractRunner {
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
-        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot.asObject().orNull()).entrySet()) {
+        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot).entrySet()) {
             switch (e.getKey()) {
                 case "update-version": {
                     updateVersion = e.getValue().asBooleanValue().orElse(false);
@@ -52,10 +50,6 @@ public class JarsRunner extends AbstractRunner {
                 }
                 case "lts-runtime-version": {
                     context().nutsLtsRuntimeVersion = e.getValue().asStringValue().get();
-                    break;
-                }
-                case "remote-ssh-host": {
-                    context().remoteTheVpcSshUser = e.getValue().asStringValue().get();
                     break;
                 }
             }
@@ -93,8 +87,9 @@ public class JarsRunner extends AbstractRunner {
     private void runNutsPublishMaven() {
         echoV("**** publish $nuts maven...", NMaps.of("nuts", NMsg.ofStyledKeyword("nuts")));
         String nutsFolder = Mvn.folder(NId.get("net.thevpc:nuts").get());
-        upload(localMvn().resolve(nutsFolder), removeMvn().resolve(nutsFolder));
-        remoteCopyFolder(removeMvn().resolve(nutsFolder), remoteThevpcMavenPath().resolve(nutsFolder));
+        upload(localMvn().resolve(nutsFolder), remoteThevpcMavenPath().resolve(nutsFolder));
+//        upload(localMvn().resolve(nutsFolder), remoteThevpcMavenPath().resolve(nutsFolder));
+//        remoteCopyFolder(remoteMvn().resolve(nutsFolder), remoteThevpcMavenPath().resolve(nutsFolder));
     }
 
 //    private void runNutsPublishStandard() {

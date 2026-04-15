@@ -42,7 +42,7 @@ public class InstallerRunner extends AbstractRunner {
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
-        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot.asObject().orNull()).entrySet()) {
+        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot).entrySet()) {
             switch (e.getKey()) {
                 case "build-native": {
                     buildNative=e.getValue().asBooleanValue().orElse(false);
@@ -96,8 +96,8 @@ public class InstallerRunner extends AbstractRunner {
         NPath thevpcNutsVer = remoteTheVpcNutsPath().resolve(Nuts.getVersion().toString());
 
 
-        NPath thevpcNutsVerWithSsh = NPath.of(NConnectionString.of(context().getRemoteTheVpcSshConnection().get()).builder().setProtocol("ssh").setPath(thevpcNutsVer.toString()).build());
-        NPathType type = thevpcNutsVerWithSsh.type();
+//        NPath thevpcNutsVerWithSsh = NPath.of(NConnectionString.of(context().getRemoteTheVpcSshConnection().get()).builder().setProtocol("ssh").setPath(thevpcNutsVer.toString()).build());
+//        NPathType type = thevpcNutsVerWithSsh.type();
         if (buildInstaller) {
             r.setSupported(NativeBuilder.PackageType.PORTABLE);
             if(buildNative){
@@ -109,7 +109,8 @@ public class InstallerRunner extends AbstractRunner {
             r.setProfilingArgs(new String[0]);
             r.build();
             if (context().publish) {
-                thevpcNutsVerWithSsh.mkdirs();
+                remoteMkdirs(thevpcNutsVer.toString());
+//                thevpcNutsVerWithSsh.mkdirs();
                 for (NPath nPath : r.getGeneratedFiles()) {
                     upload(nPath, thevpcNutsVer.resolve(nPath.getName()).toString());
                 }
@@ -127,7 +128,8 @@ public class InstallerRunner extends AbstractRunner {
             r.setProfilingArgs(new String[]{"--sandbox","--verbose"});
             r.build();
             if (context().publish) {
-                thevpcNutsVerWithSsh.mkdirs();
+                remoteMkdirs(thevpcNutsVer.toString());
+//                thevpcNutsVerWithSsh.mkdirs();
                 for (NPath nPath : r.getGeneratedFiles()) {
                     upload(nPath, thevpcNutsVer.resolve(nPath.getName()).toString());
                 }

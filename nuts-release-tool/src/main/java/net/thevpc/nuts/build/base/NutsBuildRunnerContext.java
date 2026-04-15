@@ -24,8 +24,6 @@ public class NutsBuildRunnerContext {
 
     public Map<String, String> vars = new HashMap<>();
     public String home = System.getProperty("user.home");
-    public String remoteTheVpcSshUser = System.getProperty("user.name");
-    public String remoteTheVpcSshHost = "thevpc.net";
     public NPath nutsRootFolder;
     public boolean publish;
     public boolean buildSite = false;
@@ -45,11 +43,7 @@ public class NutsBuildRunnerContext {
     public boolean trace = false;
 
     public NOptional<String> getRemoteTheVpcSshHost() {
-        return NOptional.of(remoteTheVpcSshHost);
-    }
-
-    public void setRemoteTheVpcSshHost(String remoteTheVpcSshHost) {
-        this.remoteTheVpcSshHost = remoteTheVpcSshHost;
+        return getVar("REMOTE_NUTS_THEVPC_DEPLOY_SERVER");
     }
 
     public NOptional<String> getRemoteTheVpcSshConnection() {
@@ -68,11 +62,7 @@ public class NutsBuildRunnerContext {
     }
 
     public String getRemoteTheVpcSshUser() {
-        return remoteTheVpcSshUser;
-    }
-
-    public void setRemoteTheVpcSshUser(String remoteUser) {
-        this.remoteTheVpcSshUser = remoteUser;
+        return getVar("REMOTE_NUTS_THEVPC_DEPLOY_USER").get();
     }
 
     public Function<String, Object> varMapper() {
@@ -115,6 +105,10 @@ public class NutsBuildRunnerContext {
                 return null;
             }
         };
+    }
+
+    public NOptional<String> getVar(String key) {
+        return NOptional.ofNamed(vars.get(key),key);
     }
 
     public void setVar(String key, String value) {
