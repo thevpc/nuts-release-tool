@@ -138,18 +138,19 @@ public class NativeBuilder {
 
     private List<NPath> createDistPortableJar() {
         echo("**** [$id] create $v...", NMaps.of("id", appId, "v", NMsg.ofStyledKeyword("jar")));
-        NPath targetFolder = dist.resolve(evalNameNoVersion(null, "jar", null));
-        if (targetFolder.isDirectory()) {
-            targetFolder.deleteTree();
-        }
-        targetFolder.mkdirs();
+//        NPath targetFolder = dist.resolve(evalNameNoVersion(null, "jar", null));
+//        if (targetFolder.isDirectory()) {
+//            targetFolder.deleteTree();
+//        }
+//        targetFolder.mkdirs();
         NPath distJar = evalSrcDistJar();
         NPath installerJarPath = projectFolder.resolve("target").resolve(projectId.getArtifactId() + "-" + projectId.getVersion() + ".jar");
-        NPath f = targetFolder.resolve(distJar.getName());
-        installerJarPath.copyTo(f);
+//        NPath f = targetFolder.resolve(distJar.getName());
+        NPath f2 = dist.resolve(installerJarPath.getName());
+//        installerJarPath.copyTo(f);
         installerJarPath.copyTo(distJar);
-        installerJarPath.copyTo(dist.resolve(installerJarPath.getName()));
-        return Collections.singletonList(f);
+        installerJarPath.copyTo(f2);
+        return Collections.singletonList(f2);
     }
 
     private List<NPath> createDistNativeGraalVMBin() {
@@ -216,6 +217,7 @@ public class NativeBuilder {
                 .failFast()
                 .run();
         ret.add(zipFolder(rootDistLinux64Bin, platform, "bin"));
+        rootDistLinux64Bin.deleteTree();
         return ret;
     }
 
@@ -230,10 +232,10 @@ public class NativeBuilder {
                     if (name.endsWith(".class") && name.startsWith(relPath)) {
                         String className = name.replace('/', '.')
                                 .substring(0, name.length() - 6);
-                        if(className.endsWith("package-info")){
+                        if (className.endsWith("package-info")) {
                             continue;
                         }
-                        if(className.matches(".*[$][0-9]+.*")){
+                        if (className.matches(".*[$][0-9]+.*")) {
                             continue;
                         }
                         try {
@@ -435,6 +437,7 @@ public class NativeBuilder {
                 .findFirst().get();
         NPath nexName = dist.resolve(appName + "-linux64-rpm-" + version + ".rpm");
         rpmFile.copyTo(nexName);
+        targetFolder.deleteTree();
         return Collections.singletonList(nexName);
     }
 
@@ -499,9 +502,10 @@ public class NativeBuilder {
                 .addCommand(target)
                 .failFast()
                 .run();
-        return Collections.singletonList(
-                zipFolder(target.resolveSibling(target.getName() + ".app"), platform, null)
-        );
+        NPath base = target.resolveSibling(target.getName() + ".app");
+        NPath res = zipFolder(base, platform, null);
+        base.deleteTree();
+        return Collections.singletonList(res);
     }
 
     private List<NPath> createDistNativePackrAllWithJava() {
@@ -592,7 +596,9 @@ public class NativeBuilder {
                 .addCommand(f)
                 .failFast()
                 .run();
-        return Collections.singletonList(zipFolder(f, platform, "with-java"));
+        NPath res = zipFolder(f, platform, "with-java");
+        f.deleteTree();
+        return Collections.singletonList(res);
     }
 
 
@@ -621,7 +627,7 @@ public class NativeBuilder {
 
     private NPath createDigest256(NPath from) {
         NPath to = from.resolveSibling(from.getName() + ".sha256");
-        to.writeString(NDigest.of().sha256().addSource(from).computeString().toLowerCase());
+        to.writeString(NDigest.of().sha256().addSource(from).computeManifestString());
         return to;
     }
 

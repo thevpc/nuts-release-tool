@@ -106,7 +106,7 @@ public class InstallerRunner extends AbstractRunner {
             r.setMainClass("net.thevpc.nuts.installer.NutsInstaller");
             r.setProjectFolder(context().nutsRootFolder.resolve("installers/nuts-installer"), null, null);
             r.setDist(sharedDistFolder);
-            r.setProfilingArgs(new String[0]);
+            r.setProfilingArgs(new String[]{"--build-native-profiling"});
             r.build();
             if (context().publish) {
                 remoteMkdirs(thevpcNutsVer.toString());
