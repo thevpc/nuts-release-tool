@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Function;
 
+import net.thevpc.nuts.build.builders.BaseConfRunner;
+import net.thevpc.nuts.build.util.NReleaseUtils;
 import net.thevpc.nuts.elem.*;
 import net.thevpc.nuts.io.NOut;
 import net.thevpc.nuts.cmdline.NCmdLine;
@@ -115,11 +117,35 @@ public class NutsBuildRunnerContext {
         this.vars.put(key, value);
     }
 
+    public Map<String, NElement> loadConfigNamedPairs() {
+        return NReleaseUtils.asNamedPairs(confRoot);
+    }
+
     public void loadConfig(NCmdLine cmdLine) {
         if (this.confFileTson.isRegularFile()) {
             NOut.println(NMsg.ofC("loadConfig %s", this.confFileTson));
             confRoot = NElementReader.ofTson().read(confFileTson);
-
+            NPath local = this.confFileTson.resolveSibling(BaseConfRunner.NUTS_RELEASE_CONF_TSON_LOCAL);
+            if(local.isRegularFile()){
+                NElement confRoot2 = NElementReader.ofTson().read(local);
+                NElementBuilder confRootBuilder = confRoot.builder();
+                if(confRootBuilder.type()==NElementType.FRAGMENT){
+                    NFragmentElementBuilder confRootBuilderF=(NFragmentElementBuilder) confRootBuilder;
+                    if(confRoot2.type()==NElementType.FRAGMENT){
+                        confRootBuilderF.addAll(confRoot2.asFragment().get().children());
+                    }else if(confRoot2.type()==NElementType.OBJECT){
+                        confRootBuilderF.addAll(confRoot2.asObject().get().children());
+                    }
+                }else if(confRootBuilder.type()==NElementType.OBJECT){
+                    NObjectElementBuilder confRootBuilderF=(NObjectElementBuilder) confRootBuilder;
+                    if(confRoot2.type()==NElementType.FRAGMENT){
+                        confRootBuilderF.addAll(confRoot2.asFragment().get().children());
+                    }else if(confRoot2.type()==NElementType.OBJECT){
+                        confRootBuilderF.addAll(confRoot2.asObject().get().children());
+                    }
+                }
+                confRoot=confRootBuilder.build();
+            }
         }
     }
 }

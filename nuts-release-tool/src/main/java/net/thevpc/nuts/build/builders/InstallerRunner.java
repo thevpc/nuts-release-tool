@@ -42,18 +42,18 @@ public class InstallerRunner extends AbstractRunner {
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
-        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot).entrySet()) {
+        for (Map.Entry<String, NElement> e : context().loadConfigNamedPairs().entrySet()) {
             switch (e.getKey()) {
                 case "build-native": {
-                    buildNative=e.getValue().asBooleanValue().orElse(false);
+                    buildNative=e.getValue().asBooleanValue().orElse(buildNative);
                     break;
                 }
                 case "build-installer": {
-                    buildInstaller=e.getValue().asBooleanValue().orElse(false);
+                    buildInstaller=e.getValue().asBooleanValue().orElse(buildInstaller);
                     break;
                 }
                 case "build-bin": {
-                    buildBin=e.getValue().asBooleanValue().orElse(false);
+                    buildBin=e.getValue().asBooleanValue().orElse(buildBin);
                     break;
                 }
             }
@@ -114,6 +114,9 @@ public class InstallerRunner extends AbstractRunner {
                 for (NPath nPath : r.getGeneratedFiles()) {
                     upload(nPath, thevpcNutsVer.resolve(nPath.getName()).toString());
                 }
+                for (NPath nPath : r.getGeneratedDigestFiles()) {
+                    upload(nPath, thevpcNutsVer.resolve(nPath.getName()).toString());
+                }
             }
         }
 
@@ -131,6 +134,9 @@ public class InstallerRunner extends AbstractRunner {
                 remoteMkdirs(thevpcNutsVer.toString());
 //                thevpcNutsVerWithSsh.mkdirs();
                 for (NPath nPath : r.getGeneratedFiles()) {
+                    upload(nPath, thevpcNutsVer.resolve(nPath.getName()).toString());
+                }
+                for (NPath nPath : r.getGeneratedDigestFiles()) {
                     upload(nPath, thevpcNutsVer.resolve(nPath.getName()).toString());
                 }
             }

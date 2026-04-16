@@ -24,14 +24,14 @@ public class ReposRunner extends AbstractRunner {
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
-        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot).entrySet()) {
+        for (Map.Entry<String, NElement> e : context().loadConfigNamedPairs().entrySet()) {
             switch (e.getKey()) {
                 case "build-repo-nuts-preview": {
-                    repoPreview=e.getValue().asBooleanValue().orElse(false);
+                    repoPreview=e.getValue().asBooleanValue().orElse(repoPreview);
                     break;
                 }
                 case "build-repo-nuts-public": {
-                    repoPublic=e.getValue().asBooleanValue().orElse(false);
+                    repoPublic=e.getValue().asBooleanValue().orElse(repoPublic);
                     break;
                 }
             }

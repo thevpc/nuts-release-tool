@@ -26,30 +26,30 @@ public class JarsRunner extends AbstractRunner {
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
-        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot).entrySet()) {
+        for (Map.Entry<String, NElement> e : context().loadConfigNamedPairs().entrySet()) {
             switch (e.getKey()) {
                 case "update-version": {
-                    updateVersion = e.getValue().asBooleanValue().orElse(false);
+                    updateVersion = e.getValue().asBooleanValue().orElse(updateVersion);
                     break;
                 }
                 case "keep-stamp": {
-                    keepStamp = e.getValue().asBooleanValue().orElse(false);
+                    keepStamp = e.getValue().asBooleanValue().orElse(keepStamp);
                     break;
                 }
                 case "production-mode": {
-                    productionMode = e.getValue().asBooleanValue().orElse(false);
+                    productionMode = e.getValue().asBooleanValue().orElse(productionMode);
                     break;
                 }
                 case "lts-api-version": {
-                    context().nutsLtsApiVersion = e.getValue().asStringValue().get();
+                    context().nutsLtsApiVersion = e.getValue().asStringValue().orElse(context().nutsLtsApiVersion);
                     break;
                 }
                 case "lts-app-version": {
-                    context().nutsLtsAppVersion = e.getValue().asStringValue().get();
+                    context().nutsLtsAppVersion = e.getValue().asStringValue().orElse(context().nutsLtsAppVersion);
                     break;
                 }
                 case "lts-runtime-version": {
-                    context().nutsLtsRuntimeVersion = e.getValue().asStringValue().get();
+                    context().nutsLtsRuntimeVersion = e.getValue().asStringValue().orElse(context().nutsLtsRuntimeVersion);
                     break;
                 }
             }

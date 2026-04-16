@@ -2,15 +2,25 @@ package net.thevpc.nuts.build.util;
 
 import net.thevpc.nuts.artifact.*;
 import net.thevpc.nuts.command.NExec;
+import net.thevpc.nuts.core.NWorkspace;
+import net.thevpc.nuts.elem.NElement;
+import net.thevpc.nuts.elem.NElementWriter;
+import net.thevpc.nuts.io.NDigest;
 import net.thevpc.nuts.io.NOut;
 import net.thevpc.nuts.io.NPath;
+import net.thevpc.nuts.io.NPathOption;
 import net.thevpc.nuts.platform.NEnv;
 import net.thevpc.nuts.text.NMsg;
 import net.thevpc.nuts.text.NMsgParam;
 import net.thevpc.nuts.util.NMaps;
 import net.thevpc.nuts.util.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 import java.util.stream.Collectors;
 
 public class NativeBuilder {
@@ -27,7 +37,8 @@ public class NativeBuilder {
     private NId projectId;
     private NPath jarPath;
     private List<NPath> icons;
-    private List<NPath> generatedFiles;
+    private final List<NPath> generatedFiles = new ArrayList<>();
+    private final List<NPath> generatedDigestFiles = new ArrayList<>();
     private String appName;
     private String displayName;
     private String vendor;
@@ -126,23 +137,23 @@ public class NativeBuilder {
 
 
     private List<NPath> createDistPortableJar() {
-        echo("**** [$id] create $v...", NMaps.of("id",appId,"v", NMsg.ofStyledKeyword("jar")));
+        echo("**** [$id] create $v...", NMaps.of("id", appId, "v", NMsg.ofStyledKeyword("jar")));
         NPath targetFolder = dist.resolve(evalNameNoVersion(null, "jar", null));
         if (targetFolder.isDirectory()) {
             targetFolder.deleteTree();
         }
         targetFolder.mkdirs();
         NPath distJar = evalSrcDistJar();
-        NPath installerJarPath = projectFolder.resolve("target").resolve(projectId.getArtifactId()+"-"+projectId.getVersion()+".jar");
+        NPath installerJarPath = projectFolder.resolve("target").resolve(projectId.getArtifactId() + "-" + projectId.getVersion() + ".jar");
         NPath f = targetFolder.resolve(distJar.getName());
         installerJarPath.copyTo(f);
         installerJarPath.copyTo(distJar);
         installerJarPath.copyTo(dist.resolve(installerJarPath.getName()));
-        return Arrays.asList(f);
+        return Collections.singletonList(f);
     }
 
     private List<NPath> createDistNativeGraalVMBin() {
-        echo("**** [$id] create $v (GraalVM)...", NMaps.of("id",appId,"v", NMsg.ofStyledKeyword("native-image")));
+        echo("**** [$id] create $v (GraalVM)...", NMaps.of("id", appId, "v", NMsg.ofStyledKeyword("native-image")));
         List<NPath> ret = new ArrayList<>();
 
         BinPlatform platform = currentPlatform();
@@ -154,6 +165,7 @@ public class NativeBuilder {
 
 
         NPath srcDistMetaInfNativeImage = evalSrcDist().resolve("META-INF/native-image");
+        generateGenReflect();
         srcDistMetaInfNativeImage.mkdirs();
         NPath newJarPath = evalSrcDistJar();
         jarPath.copyTo(newJarPath);
@@ -163,10 +175,10 @@ public class NativeBuilder {
         ensureRegularFile(graalvmHome + "/bin/java", "graalvmHome");
         ensureRegularFile(graalvmHome + "/bin/native-image", "graalvmHome");
         NExec.of().system()
-                .setEnv("JAVA_HOME",graalvmHome)
+                .setEnv("JAVA_HOME", graalvmHome)
                 .setDirectory(evalSrcDist())
                 .addCommand(graalvmHome + "/bin/java")
-                .addCommand("-agentlib:native-image-agent=config-output-dir=" + srcDistMetaInfNativeImage)
+                .addCommand("-agentlib:native-image-agent=config-merge-dir=" + srcDistMetaInfNativeImage)
                 .addCommand("-DEnableGraalVM=true")
                 .addCommand("-jar")
                 .addCommand(newJarPath)
@@ -176,19 +188,25 @@ public class NativeBuilder {
 
         NPath f = rootDistLinux64Bin.resolve(evalName(platform, null, null));
         NExec.of().system()
-                .setEnv("JAVA_HOME",graalvmHome)
+                .setEnv("JAVA_HOME", graalvmHome)
                 .setDirectory(evalSrcDist())
                 .addCommand(graalvmHome + "/bin/native-image")
                 .addCommand("--enable-http")
                 .addCommand("--enable-https")
                 .addCommand("--enable-https")
                 .addCommand("--no-fallback")
+                .addCommand("-O3")
                 .addCommand("-H:+UnlockExperimentalVMOptions")
                 .addCommand("-H:ConfigurationFileDirectories=" + srcDistMetaInfNativeImage)
                 .addCommand(
-                        (srcDistMetaInfNativeImage.resolve("my-reflect-config.json")).isRegularFile()?
-                        "-H:ReflectionConfigurationFiles=" + srcDistMetaInfNativeImage.resolve("my-reflect-config.json")
-                                :null
+                        (srcDistMetaInfNativeImage.resolve("my-reflect-config.json")).isRegularFile() ?
+                                "-H:ReflectionConfigurationFiles=" + srcDistMetaInfNativeImage.resolve("my-reflect-config.json")
+                                : null
+                )
+                .addCommand(
+                        (srcDistMetaInfNativeImage.resolve("my-resource-config.json")).isRegularFile() ?
+                                "-H:ResourceConfigurationFiles=" + srcDistMetaInfNativeImage.resolve("my-resource-config.json")
+                                : null
                 )
                 .addCommand("-Djava.awt.headless=false")
                 .addCommand("-DEnableGraalVM=true")
@@ -199,6 +217,107 @@ public class NativeBuilder {
                 .run();
         ret.add(zipFolder(rootDistLinux64Bin, platform, "bin"));
         return ret;
+    }
+
+    public List<Class<?>> getClassesFromJar(NPath[] jarFiles, String packageName) {
+        List<Class<?>> classes = new ArrayList<>();
+        String relPath = packageName.replace('.', '/');
+        for (NPath jarFile : jarFiles) {
+            try (JarInputStream jarStream = new JarInputStream(jarFile.getInputStream())) {
+                JarEntry entry;
+                while ((entry = jarStream.getNextJarEntry()) != null) {
+                    String name = entry.getName();
+                    if (name.endsWith(".class") && name.startsWith(relPath)) {
+                        String className = name.replace('/', '.')
+                                .substring(0, name.length() - 6);
+                        try {
+                            classes.add(Class.forName(className, false,
+                                    Thread.currentThread().getContextClassLoader()));
+                        } catch (ClassNotFoundException ignored) {
+                            // Skip classes that cannot be loaded
+                        }
+                    }
+                }
+            } catch (IOException ex) {
+                //
+            }
+        }
+        return classes;
+    }
+
+    private void generateGenReflect() {
+        NPath b = (projectFolder).getParent().resolve("nuts-api/src/main/java/net/thevpc/nuts");
+        NPath srcDistMetaInfNativeImage = evalSrcDist().resolve("META-INF/native-image").resolve("my-reflect-config.json");
+        List<Map<String, Object>> config = new ArrayList<>();
+        {
+            // add defaults
+            Map<String, Object> entry = new LinkedHashMap<>();
+            entry.put("name", "java.lang.Class");
+            entry.put("queryAllDeclaredConstructors", true);
+            entry.put("queryAllPublicConstructors", true);
+            entry.put("queryAllDeclaredMethods", true);
+            entry.put("allDeclaredClasses", true);
+            entry.put("allPublicClasses", true);
+            entry.put("allPublicMethods", true);
+            entry.put("queryAllPublicMethods", true);
+            entry.put("allPublicFields", true);
+            entry.put("allPublicConstructors", true);
+            config.add(entry);
+        }
+        NVersion bootVersion = NWorkspace.of().getApiId().getVersion();
+        NVersion apiVersion = NWorkspace.of().getApiId().getVersion();
+        NVersion runtimeVersion = NWorkspace.of().getRuntimeId().getVersion();
+        List<Class<?>> allClasses = getClassesFromJar(
+                new NPath[]{
+                        NPath.ofUserHome().resolve(".m2/repository/net/thevpc/nuts/nuts-boot/" + bootVersion + "/nuts-boot-" + bootVersion + ".jar"),
+                        NPath.ofUserHome().resolve(".m2/repository/net/thevpc/nuts/nuts/" + apiVersion + "/nuts-" + apiVersion + ".jar"),
+                        NPath.ofUserHome().resolve(".m2/repository/net/thevpc/nuts/nuts-runtime/" + runtimeVersion + "/nuts-runtime-" + runtimeVersion + ".jar")
+                }
+                , "net.thevpc.nuts"
+        );
+        Set<Class<?>> allClassesOk=new TreeSet<>(new Comparator<Class<?>>() {
+            @Override
+            public int compare(Class<?> o1, Class<?> o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+        for (Class<?> aClass : allClasses) {
+            _mark(aClass,allClassesOk);
+        }
+
+        for (Class<?> aClass : allClassesOk) {
+            Map<String, Object> entry = new LinkedHashMap<>();
+            entry.put("name", aClass.getName());
+            entry.put("allPublicMethods", true);
+            entry.put("queryAllPublicMethods", true);
+            entry.put("allPublicFields", true);
+            entry.put("allPublicConstructors", true);
+            if(aClass.getName().startsWith("net.thevpc.nuts")){
+                entry.put("allDeclaredFields", true);
+                entry.put("allDeclaredMethods", true);
+                entry.put("allDeclaredConstructors", true);
+                entry.put("queryAllDeclaredMethods", true);
+                entry.put("queryAllPublicConstructors", true);
+                entry.put("queryAllDeclaredConstructors", true);
+                entry.put("allowWrite", true);
+            }
+            config.add(entry);
+        }
+        NElementWriter.ofJson().println(config, srcDistMetaInfNativeImage);
+    }
+
+    private void _mark(Class<?> aClass, Set<Class<?>> allClassesOk) {
+        allClassesOk.add(aClass);
+        Class<?> sc = aClass.getSuperclass();
+        if(sc!=null){
+            _mark(sc,allClassesOk);
+        }
+        Class<?>[] interfaces = aClass.getInterfaces();
+        if(interfaces!=null){
+            for (Class<?> i : interfaces) {
+                _mark(i,allClassesOk);
+            }
+        }
     }
 
     private NPath zipFolder(NPath folder, BinPlatform platform, String discriminator) {
@@ -281,7 +400,7 @@ public class NativeBuilder {
     }
 
     private List<NPath> createDistJPackageRPM() {
-        echo("**** [$id] create $v (JPackage)...", NMaps.of("id",appId,"v", NMsg.ofStyledKeyword("rpm")));
+        echo("**** [$id] create $v (JPackage)...", NMaps.of("id", appId, "v", NMsg.ofStyledKeyword("rpm")));
         NPath targetFolder = dist.resolve(evalNameNoVersion(evalCurrentBinPlatform(), "rpm", null)
         );
         BinPlatform platform = currentPlatform();
@@ -310,7 +429,7 @@ public class NativeBuilder {
                 .findFirst().get();
         NPath nexName = dist.resolve(appName + "-linux64-rpm-" + version + ".rpm");
         rpmFile.copyTo(nexName);
-        return Arrays.asList(nexName);
+        return Collections.singletonList(nexName);
     }
 
     private List<NPath> createDistNativeJar2appAllBin() {
@@ -344,7 +463,7 @@ public class NativeBuilder {
 
     private List<NPath> createDistNativeJar2app(BinPlatform platform) {
         echo("**** [$id] create $v $p (Jar2App)...",
-                NMaps.of("id",appId,
+                NMaps.of("id", appId,
                         "v", NMsg.ofStyledKeyword("bin")
                         , "p", platform
                 )
@@ -364,8 +483,8 @@ public class NativeBuilder {
                 .addCommand(
                         icons == null ? null :
                                 icons.stream().filter(x -> x.getName().endsWith(".icns"))
-                                        .map(x -> "--icon=" + x.toString())
-                                        .findFirst().orElse(null)
+                                .map(x -> "--icon=" + x)
+                                .findFirst().orElse(null)
                 )
                 .addCommand("--bundle-identifier=" + appId)
                 .addCommand("--display-name=" + displayName)
@@ -374,7 +493,7 @@ public class NativeBuilder {
                 .addCommand(target)
                 .failFast()
                 .run();
-        return Arrays.asList(
+        return Collections.singletonList(
                 zipFolder(target.resolveSibling(target.getName() + ".app"), platform, null)
         );
     }
@@ -406,7 +525,7 @@ public class NativeBuilder {
 
     private List<NPath> createDistNativePackrWithJava(BinPlatform platform) {
         echo("**** [$id] create $v $p (Packr)...",
-                NMaps.of("id",appId,
+                NMaps.of("id", appId,
                         "v", NMsg.ofStyledKeyword("with-java")
                         , "p", platform
                 )
@@ -467,12 +586,13 @@ public class NativeBuilder {
                 .addCommand(f)
                 .failFast()
                 .run();
-        return Arrays.asList(zipFolder(f, platform, "with-java"));
+        return Collections.singletonList(zipFolder(f, platform, "with-java"));
     }
 
 
     public void build() {
-        generatedFiles = new ArrayList<>();
+        generatedFiles.clear();
+        generatedDigestFiles.clear();
         if (isSupported(PackageType.PORTABLE)) {
             generatedFiles.addAll(createDistPortableJar());
         }
@@ -488,6 +608,15 @@ public class NativeBuilder {
         if (isSupported(PackageType.NATIVE)) {
             generatedFiles.addAll(createDistNativeJar2appAllBin());
         }
+        for (NPath generatedFile : generatedFiles) {
+            generatedDigestFiles.add(createDigest256(generatedFile));
+        }
+    }
+
+    private NPath createDigest256(NPath from) {
+        NPath to = from.resolveSibling(from.getName() + ".sha256");
+        to.writeString(NDigest.of().sha256().addSource(from).computeString().toLowerCase());
+        return to;
     }
 
     private boolean isSupported(PackageType packageType) {
@@ -585,14 +714,14 @@ public class NativeBuilder {
         NDescriptor nDescriptor = NDescriptorParser.of().setDescriptorStyle(NDescriptorStyle.MAVEN).parse(getProjectFolder().resolve("pom.xml")).get();
         this.projectId = nDescriptor.getId();
         if (preferredId != null && preferredId.getVersion().isBlank()) {
-            preferredId=preferredId.builder().setVersion(projectId.getVersion()).build();
+            preferredId = preferredId.builder().setVersion(projectId.getVersion()).build();
         }
         if (preferredId != null && NBlankable.isBlank(preferredId.getGroupId())) {
-            preferredId=preferredId.builder().setGroupId(projectId.getGroupId()).build();
+            preferredId = preferredId.builder().setGroupId(projectId.getGroupId()).build();
         }
         if (preferredId != null && !NBlankable.isBlank(preferredId.getArtifactId())) {
             setAppName(preferredId.getArtifactId());
-        }else{
+        } else {
             setAppName(projectId.getArtifactId());
         }
         setDisplayName(nDescriptor.getName());
@@ -629,9 +758,8 @@ public class NativeBuilder {
         return generatedFiles;
     }
 
-    public NativeBuilder setGeneratedFiles(List<NPath> generatedFiles) {
-        this.generatedFiles = generatedFiles;
-        return this;
+    public List<NPath> getGeneratedDigestFiles() {
+        return generatedDigestFiles;
     }
 
     public String getAppName() {

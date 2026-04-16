@@ -42,10 +42,10 @@ public class CompatRunner extends AbstractRunner {
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
-        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot).entrySet()) {
+        for (Map.Entry<String, NElement> e : context().loadConfigNamedPairs().entrySet()) {
             switch (e.getKey()) {
                 case "build-compat": {
-                    buildCompat = e.getValue().asBooleanValue().orElse(false);
+                    buildCompat = e.getValue().asBooleanValue().orElse(buildCompat);
                     break;
                 }
                 case "all-versions": {

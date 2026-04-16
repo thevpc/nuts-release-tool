@@ -24,6 +24,7 @@ public class BaseConfRunner extends AbstractRunner {
 
 
     public static final String NUTS_RELEASE_CONF_TSON = "nuts-release-tool.tson";
+    public static final String NUTS_RELEASE_CONF_TSON_LOCAL = "nuts-release-tool.tson.local";
 
     @Override
     public boolean configureFirst(NCmdLine cmdLine) {
@@ -55,27 +56,29 @@ public class BaseConfRunner extends AbstractRunner {
         context().repositoryProjectFolder = context().nutsRootFolder.resolve("documentation/repo");
         context().setVar("root", context().nutsRootFolder.toString());
 
-        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot).entrySet()) {
+        for (Map.Entry<String, NElement> e : context().loadConfigNamedPairs().entrySet()) {
             switch (e.getKey()) {
                 case "trace": {
-                    context().trace=e.getValue().asBooleanValue().orElse(false);
+                    context().trace=e.getValue().asBooleanValue().orElse(context().trace);
                     NSession.of().setTrace(context().trace);
                     break;
                 }
                 case "verbose": {
-                    context().verbose=e.getValue().asBooleanValue().orElse(false);
+                    context().verbose=e.getValue().asBooleanValue().orElse(context().verbose);
                     if(context().verbose) {
                         NSession.of().setLogTermLevel(Level.FINEST);
                     }
                     break;
                 }
                 case "publish": {
-                    context().publish=e.getValue().asBooleanValue().orElse(false);
+                    context().publish=e.getValue().asBooleanValue().orElse(context().publish);
                     break;
                 }
                 case "debug": {
                     if(e.getValue().asBooleanValue().orElse(false)) {
                         context().nutsDebugArg = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005";
+                    }else{
+                        context().nutsDebugArg = "";
                     }
                     break;
                 }

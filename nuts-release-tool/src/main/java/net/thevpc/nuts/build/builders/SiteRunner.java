@@ -40,10 +40,10 @@ public class SiteRunner extends AbstractRunner {
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
-        for (Map.Entry<String, NElement> e : NReleaseUtils.asNamedPairs(context().confRoot).entrySet()) {
+        for (Map.Entry<String, NElement> e : context().loadConfigNamedPairs().entrySet()) {
             switch (e.getKey()) {
                 case "build-site": {
-                    context().buildSite=e.getValue().asBooleanValue().orElse(false);
+                    context().buildSite=e.getValue().asBooleanValue().orElse(context().buildSite);
                     break;
                 }
             }
