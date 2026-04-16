@@ -230,16 +230,22 @@ public class NativeBuilder {
                     if (name.endsWith(".class") && name.startsWith(relPath)) {
                         String className = name.replace('/', '.')
                                 .substring(0, name.length() - 6);
+                        if(className.endsWith("package-info")){
+                            continue;
+                        }
+                        if(className.matches(".*[$][0-9]+.*")){
+                            continue;
+                        }
                         try {
                             classes.add(Class.forName(className, false,
-                                    Thread.currentThread().getContextClassLoader()));
+                                    NWorkspace.of().getBootClassLoader()));
                         } catch (ClassNotFoundException ignored) {
-                            // Skip classes that cannot be loaded
+                            NOut.println(NMsg.ofC("[%s] skipped %s : %s", jarFile, className, ignored));
                         }
                     }
                 }
             } catch (IOException ex) {
-                //
+                NOut.println(NMsg.ofC("error loading jar %s : %s", jarFile));
             }
         }
         return classes;
@@ -275,14 +281,14 @@ public class NativeBuilder {
                 }
                 , "net.thevpc.nuts"
         );
-        Set<Class<?>> allClassesOk=new TreeSet<>(new Comparator<Class<?>>() {
+        Set<Class<?>> allClassesOk = new TreeSet<>(new Comparator<Class<?>>() {
             @Override
             public int compare(Class<?> o1, Class<?> o2) {
                 return o1.getName().compareTo(o2.getName());
             }
         });
         for (Class<?> aClass : allClasses) {
-            _mark(aClass,allClassesOk);
+            _mark(aClass, allClassesOk);
         }
 
         for (Class<?> aClass : allClassesOk) {
@@ -292,7 +298,7 @@ public class NativeBuilder {
             entry.put("queryAllPublicMethods", true);
             entry.put("allPublicFields", true);
             entry.put("allPublicConstructors", true);
-            if(aClass.getName().startsWith("net.thevpc.nuts")){
+            if (aClass.getName().startsWith("net.thevpc.nuts")) {
                 entry.put("allDeclaredFields", true);
                 entry.put("allDeclaredMethods", true);
                 entry.put("allDeclaredConstructors", true);
@@ -309,13 +315,13 @@ public class NativeBuilder {
     private void _mark(Class<?> aClass, Set<Class<?>> allClassesOk) {
         allClassesOk.add(aClass);
         Class<?> sc = aClass.getSuperclass();
-        if(sc!=null){
-            _mark(sc,allClassesOk);
+        if (sc != null) {
+            _mark(sc, allClassesOk);
         }
         Class<?>[] interfaces = aClass.getInterfaces();
-        if(interfaces!=null){
+        if (interfaces != null) {
             for (Class<?> i : interfaces) {
-                _mark(i,allClassesOk);
+                _mark(i, allClassesOk);
             }
         }
     }
