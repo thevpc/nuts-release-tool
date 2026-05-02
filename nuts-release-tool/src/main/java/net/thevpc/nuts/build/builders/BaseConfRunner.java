@@ -24,7 +24,7 @@ public class BaseConfRunner extends AbstractRunner {
 
 
     public static final String NUTS_RELEASE_CONF_TSON = "nuts-release-tool.tson";
-    public static final String NUTS_RELEASE_CONF_TSON_LOCAL = "nuts-release-tool.tson.local";
+    public static final String NUTS_RELEASE_CONF_TSON_LOCAL = "nuts-release-tool.local.tson";
 
     @Override
     public boolean configureFirst(NCmdLine cmdLine) {
