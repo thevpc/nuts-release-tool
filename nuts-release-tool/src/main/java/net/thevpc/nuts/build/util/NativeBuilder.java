@@ -3,20 +3,16 @@ package net.thevpc.nuts.build.util;
 import net.thevpc.nuts.artifact.*;
 import net.thevpc.nuts.command.NExec;
 import net.thevpc.nuts.core.NWorkspace;
-import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.elem.NElementWriter;
 import net.thevpc.nuts.io.NDigest;
 import net.thevpc.nuts.io.NOut;
 import net.thevpc.nuts.io.NPath;
-import net.thevpc.nuts.io.NPathOption;
 import net.thevpc.nuts.platform.NEnv;
 import net.thevpc.nuts.text.NMsg;
 import net.thevpc.nuts.text.NMsgParam;
 import net.thevpc.nuts.util.NMaps;
 import net.thevpc.nuts.util.*;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.jar.JarEntry;
@@ -176,8 +172,8 @@ public class NativeBuilder {
         ensureRegularFile(graalvmHome + "/bin/java", "graalvmHome");
         ensureRegularFile(graalvmHome + "/bin/native-image", "graalvmHome");
         NExec.of().system()
-                .setEnv("JAVA_HOME", graalvmHome)
-                .setDirectory(evalSrcDist())
+                .env("JAVA_HOME", graalvmHome)
+                .directory(evalSrcDist())
                 .addCommand(graalvmHome + "/bin/java")
                 .addCommand("-agentlib:native-image-agent=config-merge-dir=" + srcDistMetaInfNativeImage)
                 .addCommand("-DEnableGraalVM=true")
@@ -189,8 +185,8 @@ public class NativeBuilder {
 
         NPath f = rootDistLinux64Bin.resolve(evalName(platform, null, null));
         NExec.of().system()
-                .setEnv("JAVA_HOME", graalvmHome)
-                .setDirectory(evalSrcDist())
+                .env("JAVA_HOME", graalvmHome)
+                .directory(evalSrcDist())
                 .addCommand(graalvmHome + "/bin/native-image")
                 .addCommand("--enable-http")
                 .addCommand("--enable-https")
@@ -331,7 +327,7 @@ public class NativeBuilder {
     private NPath zipFolder(NPath folder, BinPlatform platform, String discriminator) {
         NPath fzip = folder.resolveSibling(evalName(platform, discriminator, ".zip"));
         NExec.of().system()
-                .setDirectory(folder.getParent())
+                .directory(folder.getParent())
                 .addCommand("zip")
                 .addCommand("-r")
                 .addCommand(fzip)
@@ -450,7 +446,7 @@ public class NativeBuilder {
     private NPath installJar2App() {
         NPath jar2appBase = NPath.ofTempFolder("jar2app");
         NExec.of().system()
-                .setDirectory(jar2appBase)
+                .directory(jar2appBase)
                 .addCommand("git", "clone")
                 .addCommand("https://github.com/Jorl17/jar2app.git")
                 .failFast()
@@ -465,8 +461,8 @@ public class NativeBuilder {
 //                jar2appFolderBin
 //        );
 //        jar2appFolderBin=jar2appFolderBin.setUserTemporary(true);
-        NExec.of().system().setDirectory(jar2appFolderSrc).failFast().addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app_basefiles").toString()).run();
-        NExec.of().system().setDirectory(jar2appFolderSrc).failFast().addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app").toString()).run();
+        NExec.of().system().directory(jar2appFolderSrc).failFast().addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app_basefiles").toString()).run();
+        NExec.of().system().directory(jar2appFolderSrc).failFast().addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app").toString()).run();
         return jar2appFolderSrc;
     }
 
@@ -483,7 +479,7 @@ public class NativeBuilder {
         }
         NPath jar2AppRoot = installJar2App();
         NExec.of().system()
-                .setDirectory(jar2AppRoot)
+                .directory(jar2AppRoot)
                 .addCommand("python3")
                 .addCommand("./jar2app")
                 .addCommand("--copyright=" + copyright)

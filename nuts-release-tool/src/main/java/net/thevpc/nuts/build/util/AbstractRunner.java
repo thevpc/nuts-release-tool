@@ -173,7 +173,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
                 .addCommand(cmd)
                 .failFast()
                 .system()
-                .setDirectory(CURRENT_FOLDER)
+                .directory(CURRENT_FOLDER)
                 .run() //                .setRedirectErrorStream()
         //                .grabOutputString()
         //                .getOutputString()
@@ -190,7 +190,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
                 .addCommand(cmd)
                 .failFast()
                 .system()
-                .setDirectory(CURRENT_FOLDER)
+                .directory(CURRENT_FOLDER)
                 .run()
                 .getGrabbedAllString();
     }

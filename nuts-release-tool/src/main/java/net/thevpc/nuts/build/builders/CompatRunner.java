@@ -7,7 +7,6 @@ package net.thevpc.nuts.build.builders;
 import net.thevpc.nuts.Nuts;
 import net.thevpc.nuts.artifact.NVersion;
 import net.thevpc.nuts.build.util.AbstractRunner;
-import net.thevpc.nuts.build.util.NReleaseUtils;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.command.NExec;
@@ -332,9 +331,9 @@ public class CompatRunner extends AbstractRunner {
                         NPath.ofUserHome().resolve(NMsg.ofV(".m2/repository/net/thevpc/nuts/nuts/$v1/nuts-$v1.jar", v -> from.toString()).toString()).toString(),
                         NPath.ofUserHome().resolve(NMsg.ofV(".m2/repository/net/thevpc/nuts/nuts/$v1/nuts-$v1.jar", v -> to.toString()).toString()).toString()
                 )
-                .setDirectory(context().websiteProjectFolder.resolve("src/main"));
+                .directory(context().websiteProjectFolder.resolve("src/main"));
         String sout = e.getGrabbedAllString();
-        int code = e.getResultCode();
+        int code = e.exitCode();
         if (code == 0) {
             // no change
             return 1;
