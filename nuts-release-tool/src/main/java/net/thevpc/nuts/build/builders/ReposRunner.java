@@ -58,17 +58,17 @@ public class ReposRunner extends AbstractRunner {
         if (repoPreview) {
             echoV("**** $v (nuts settings update stats)...", NMaps.of("v", NMsg.ofStyledKeyword("build-nuts-preview")));
             NExec.of()
-                    .addCommand("settings", "update", "stats")
-                    .addCommand(context().nutsRootFolder.resolve("../nuts-repos/nuts-preview"))
-                    .failFast()
+                    .command("settings", "update", "stats")
+                    .command(context().nutsRootFolder.resolve("../nuts-repos/nuts-preview"))
+                    .failFast(true)
                     .run();
         }
         if (repoPublic) {
             echoV("**** $v (nuts settings update stats)...", NMaps.of("v", NMsg.ofStyledKeyword("build-nuts-public")));
             NExec.of()
-                    .addCommand("settings", "update", "stats")
-                    .addCommand(context().nutsRootFolder.resolve("../nuts-repos/nuts-public"))
-                    .failFast()
+                    .command("settings", "update", "stats")
+                    .command(context().nutsRootFolder.resolve("../nuts-repos/nuts-public"))
+                    .failFast(true)
                     .run();
         }
     }

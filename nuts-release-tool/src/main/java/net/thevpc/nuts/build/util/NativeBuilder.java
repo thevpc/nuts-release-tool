@@ -180,7 +180,7 @@ public class NativeBuilder {
                 .addCommand("-jar")
                 .addCommand(newJarPath)
                 .addCommand(profilingArgs)
-                .failFast()
+                .failFast(true)
                 .run();
 
         NPath f = rootDistLinux64Bin.resolve(evalName(platform, null, null));
@@ -210,7 +210,7 @@ public class NativeBuilder {
                 .addCommand("-jar")
                 .addCommand(newJarPath)
                 .addCommand(f)
-                .failFast()
+                .failFast(true)
                 .run();
         ret.add(zipFolder(rootDistLinux64Bin, platform, "bin"));
         rootDistLinux64Bin.deleteTree();
@@ -332,7 +332,7 @@ public class NativeBuilder {
                 .addCommand("-r")
                 .addCommand(fzip)
                 .addCommand(folder.getName())
-                .failFast()
+                .failFast(true)
                 .run();
         return fzip;
     }
@@ -427,7 +427,7 @@ public class NativeBuilder {
                 .addCommand(evalName(null, null, ".jar"))
                 .addCommand("--dest")
                 .addCommand(targetFolder)
-                .failFast()
+                .failFast(true)
                 .run();
         NPath rpmFile = targetFolder.list().stream().filter(x -> x.getName().startsWith(evalName(null, null, null)))
                 .findFirst().get();
@@ -449,7 +449,7 @@ public class NativeBuilder {
                 .directory(jar2appBase)
                 .addCommand("git", "clone")
                 .addCommand("https://github.com/Jorl17/jar2app.git")
-                .failFast()
+                .failFast(true)
                 .run();
         NPath jar2appFolderSrc = jar2appBase.resolve("jar2app");
 //        NPath jar2appFolderBin=jar2appBase.resolve("jar2app-bin");
@@ -461,8 +461,8 @@ public class NativeBuilder {
 //                jar2appFolderBin
 //        );
 //        jar2appFolderBin=jar2appFolderBin.setUserTemporary(true);
-        NExec.of().system().directory(jar2appFolderSrc).failFast().addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app_basefiles").toString()).run();
-        NExec.of().system().directory(jar2appFolderSrc).failFast().addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app").toString()).run();
+        NExec.of().system().directory(jar2appFolderSrc).failFast(true).addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app_basefiles").toString()).run();
+        NExec.of().system().directory(jar2appFolderSrc).failFast(true).addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app").toString()).run();
         return jar2appFolderSrc;
     }
 
@@ -496,7 +496,7 @@ public class NativeBuilder {
                 .addCommand("--name=" + this.evalName(platform, null, null))
                 .addCommand(evalSrcDistJar())
                 .addCommand(target)
-                .failFast()
+                .failFast(true)
                 .run();
         NPath base = target.resolveSibling(target.getName() + ".app");
         NPath res = zipFolder(base, platform, null);
@@ -572,25 +572,25 @@ public class NativeBuilder {
                     .copyTo(packrbin);
         }
         NExec.of().system()
-                .addCommand("java")
-                .addCommand("-jar")
-                .addCommand(packrbin)
-                .addCommand("--platform")
-                .addCommand(platform.id())
-                .addCommand("--jdk")
-                .addCommand(jre)
-                .addCommand("--useZgcIfSupportedOs")
-                .addCommand("--executable")
-                .addCommand(evalName(platform, null, null))
-                .addCommand("--classpath")
-                .addCommand(evalSrcDistJar())
-                .addCommand("--mainclass")
-                .addCommand(NAssert.requireNamedNonBlank(mainClass, "mainClass"))
-                .addCommand("--vmargs")
-                .addCommand("Xmx1G")
-                .addCommand("--output")
-                .addCommand(f)
-                .failFast()
+                .command("java")
+                .command("-jar")
+                .command(packrbin)
+                .command("--platform")
+                .command(platform.id())
+                .command("--jdk")
+                .command(jre)
+                .command("--useZgcIfSupportedOs")
+                .command("--executable")
+                .command(evalName(platform, null, null))
+                .command("--classpath")
+                .command(evalSrcDistJar())
+                .command("--mainclass")
+                .command(NAssert.requireNamedNonBlank(mainClass, "mainClass"))
+                .command("--vmargs")
+                .command("Xmx1G")
+                .command("--output")
+                .command(f)
+                .failFast(true)
                 .run();
         NPath res = zipFolder(f, platform, "with-java");
         f.deleteTree();

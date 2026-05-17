@@ -171,7 +171,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
 //        String out =
         NExec.of()
                 .addCommand(cmd)
-                .failFast()
+                .failFast(true)
                 .system()
                 .directory(CURRENT_FOLDER)
                 .run() //                .setRedirectErrorStream()
@@ -188,7 +188,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
         }
         return NExec.of()
                 .addCommand(cmd)
-                .failFast()
+                .failFast(true)
                 .system()
                 .directory(CURRENT_FOLDER)
                 .run()
@@ -497,12 +497,12 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
 
     public void rexec(String... command) {
         NExec.of().system()
-                .addCommand(
+                .command(
                         "ssh",
                         context().getRemoteTheVpcSshConnection().get(),
                         NCmdLineWriter.of().formatPlain(NCmdLine.of(command))
                 )
-                .failFast()
+                .failFast(true)
                 .run();
     }
 
