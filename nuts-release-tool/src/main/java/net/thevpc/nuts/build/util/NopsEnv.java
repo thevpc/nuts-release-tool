@@ -21,12 +21,12 @@ public class NopsEnv {
             p = p.resolve(".nops.tson");
             if (p.isRegularFile()) {
                 List<NPath> confs = new ArrayList<>();
-                for (NPath nPath : p.getParent().list()) {
-                    if (nPath.getName().endsWith(".nops.tson")) {
+                for (NPath nPath : p.parent().list()) {
+                    if (nPath.name().endsWith(".nops.tson")) {
                         confs.add(nPath);
                     }
                 }
-                confs.sort(Comparator.comparing(x -> x.getName()));
+                confs.sort(Comparator.comparing(x -> x.name()));
                 for (NPath conf : confs) {
                     NElement parsed = NElementReader.ofTson().read(conf);
                     class InternalDoer {

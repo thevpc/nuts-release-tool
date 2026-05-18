@@ -142,7 +142,7 @@ public class NativeBuilder {
         NPath distJar = evalSrcDistJar();
         NPath installerJarPath = projectFolder.resolve("target").resolve(projectId.getArtifactId() + "-" + projectId.getVersion() + ".jar");
 //        NPath f = targetFolder.resolve(distJar.getName());
-        NPath f2 = dist.resolve(installerJarPath.getName());
+        NPath f2 = dist.resolve(installerJarPath.name());
 //        installerJarPath.copyTo(f);
         installerJarPath.copyTo(distJar);
         installerJarPath.copyTo(f2);
@@ -250,7 +250,7 @@ public class NativeBuilder {
     }
 
     private void generateGenReflect() {
-        NPath b = (projectFolder).getParent().resolve("nuts-api/src/main/java/net/thevpc/nuts");
+        NPath b = (projectFolder).parent().resolve("nuts-api/src/main/java/net/thevpc/nuts");
         NPath srcDistMetaInfNativeImage = evalSrcDist().resolve("META-INF/native-image").resolve("my-reflect-config.json");
         List<Map<String, Object>> config = new ArrayList<>();
         {
@@ -327,11 +327,11 @@ public class NativeBuilder {
     private NPath zipFolder(NPath folder, BinPlatform platform, String discriminator) {
         NPath fzip = folder.resolveSibling(evalName(platform, discriminator, ".zip"));
         NExec.of().system()
-                .directory(folder.getParent())
+                .directory(folder.parent())
                 .addCommand("zip")
                 .addCommand("-r")
                 .addCommand(fzip)
-                .addCommand(folder.getName())
+                .addCommand(folder.name())
                 .failFast(true)
                 .run();
         return fzip;
@@ -429,7 +429,7 @@ public class NativeBuilder {
                 .addCommand(targetFolder)
                 .failFast(true)
                 .run();
-        NPath rpmFile = targetFolder.list().stream().filter(x -> x.getName().startsWith(evalName(null, null, null)))
+        NPath rpmFile = targetFolder.list().stream().filter(x -> x.name().startsWith(evalName(null, null, null)))
                 .findFirst().get();
         NPath nexName = dist.resolve(appName + "-linux64-rpm-" + version + ".rpm");
         rpmFile.copyTo(nexName);
@@ -487,7 +487,7 @@ public class NativeBuilder {
                 .addCommand("--version=" + version)
                 .addCommand(
                         icons == null ? null :
-                                icons.stream().filter(x -> x.getName().endsWith(".icns"))
+                                icons.stream().filter(x -> x.name().endsWith(".icns"))
                                 .map(x -> "--icon=" + x)
                                 .findFirst().orElse(null)
                 )
@@ -498,7 +498,7 @@ public class NativeBuilder {
                 .addCommand(target)
                 .failFast(true)
                 .run();
-        NPath base = target.resolveSibling(target.getName() + ".app");
+        NPath base = target.resolveSibling(target.name() + ".app");
         NPath res = zipFolder(base, platform, null);
         base.deleteTree();
         return Collections.singletonList(res);
@@ -622,7 +622,7 @@ public class NativeBuilder {
     }
 
     private NPath createDigest256(NPath from) {
-        NPath to = from.resolveSibling(from.getName() + ".sha256");
+        NPath to = from.resolveSibling(from.name() + ".sha256");
         to.writeString(NDigest.of().sha256().addSource(from).computeManifestString());
         return to;
     }

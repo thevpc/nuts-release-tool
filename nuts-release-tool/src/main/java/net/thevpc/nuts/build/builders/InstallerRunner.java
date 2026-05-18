@@ -5,22 +5,17 @@
 package net.thevpc.nuts.build.builders;
 
 import net.thevpc.nuts.Nuts;
-import net.thevpc.nuts.artifact.NVersion;
 import net.thevpc.nuts.build.util.*;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 
-import net.thevpc.nuts.core.NSession;
 import net.thevpc.nuts.core.NWorkspace;
 import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.io.NPath;
-import net.thevpc.nuts.io.NPathType;
-import net.thevpc.nuts.net.NConnectionString;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.logging.Level;
 
 /**
  * @author vpc
@@ -112,10 +107,10 @@ public class InstallerRunner extends AbstractRunner {
                 remoteMkdirs(thevpcNutsVer.toString());
 //                thevpcNutsVerWithSsh.mkdirs();
                 for (NPath nPath : r.getGeneratedFiles()) {
-                    upload(nPath, thevpcNutsVer.resolve(nPath.getName()).toString());
+                    upload(nPath, thevpcNutsVer.resolve(nPath.name()).toString());
                 }
                 for (NPath nPath : r.getGeneratedDigestFiles()) {
-                    upload(nPath, thevpcNutsVer.resolve(nPath.getName()).toString());
+                    upload(nPath, thevpcNutsVer.resolve(nPath.name()).toString());
                 }
             }
         }
@@ -134,10 +129,10 @@ public class InstallerRunner extends AbstractRunner {
                 remoteMkdirs(thevpcNutsVer.toString());
 //                thevpcNutsVerWithSsh.mkdirs();
                 for (NPath nPath : r.getGeneratedFiles()) {
-                    upload(nPath, thevpcNutsVer.resolve(nPath.getName()).toString());
+                    upload(nPath, thevpcNutsVer.resolve(nPath.name()).toString());
                 }
                 for (NPath nPath : r.getGeneratedDigestFiles()) {
-                    upload(nPath, thevpcNutsVer.resolve(nPath.getName()).toString());
+                    upload(nPath, thevpcNutsVer.resolve(nPath.name()).toString());
                 }
             }
         }

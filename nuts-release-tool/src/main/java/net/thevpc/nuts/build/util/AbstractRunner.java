@@ -429,7 +429,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
             NPath folder = localMvn().resolve(Mvn.folder(id));
             for (NPath sub : folder.list()) {
                 if (sub.isRegularFile()) {
-                    String name = sub.getName();
+                    String name = sub.name();
                     todo.add(new PathWithPrio(
                                     Mvn.folder(id),
                                     sub,
@@ -455,10 +455,10 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
             String rfrom0 = rfrom.substring(0, rfrom.length() - 2);
             if (explodedUpload) {
                 for (NPath p : NPath.of(rfrom0).list()) {
-                    String rto = to + "/" + p.getName();
+                    String rto = to + "/" + p.name();
                     if (p.isDirectory()) {
                         remoteMkdirs(rto);
-                        rto = NPath.of(rto).getParent().toString();
+                        rto = NPath.of(rto).parent().toString();
                     }
                     scpOrRsync(p.toString(), context().getRemoteTheVpcSshConnection().get() + ":" + rto);
                 }
@@ -466,7 +466,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
                 String rto = to;
                 if (NPath.of(rfrom).isDirectory()) {
                     remoteMkdirs(rto);
-                    rto = NPath.of(rto).getParent().toString();
+                    rto = NPath.of(rto).parent().toString();
                 }
 //                log(NMsg.ofC("##upload## %s to %s",
 //                        NMsg.ofStyled(rfrom0, NTextStyle.path()),
@@ -477,7 +477,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
             String rto = NPath.of(to).toString();
             if (NPath.of(rfrom).isDirectory()) {
                 remoteMkdirs(rto);
-                rto = NPath.of(rto).getParent().toString();
+                rto = NPath.of(rto).parent().toString();
             }
             scpOrRsync(rfrom, context().getRemoteTheVpcSshConnection().get() + ":" + rto);
         }
