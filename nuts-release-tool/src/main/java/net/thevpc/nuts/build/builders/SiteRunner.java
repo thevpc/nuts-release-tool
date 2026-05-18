@@ -7,7 +7,6 @@ package net.thevpc.nuts.build.builders;
 import net.thevpc.nuts.artifact.NId;
 import net.thevpc.nuts.build.util.AbstractRunner;
 import net.thevpc.nuts.build.util.Mvn;
-import net.thevpc.nuts.build.util.NReleaseUtils;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 
@@ -105,13 +104,13 @@ public class SiteRunner extends AbstractRunner {
             String stableJarLocation = "https://maven.thevpc.net/" + Mvn.jar(stableAppId);
 
             vars.put("stableApiId", stableApiId.toString());
-            vars.put("stableApiVersion", stableApiId.getVersion().toString());
+            vars.put("stableApiVersion", stableApiId.version().toString());
 
             vars.put("stableAppId", stableAppId.toString());
-            vars.put("stableAppVersion", stableAppId.getVersion().toString());
+            vars.put("stableAppVersion", stableAppId.version().toString());
 
             vars.put("stableRuntimeId", stableRuntimeId.toString());
-            vars.put("stableRuntimeVersion", stableRuntimeId.getVersion().toString());
+            vars.put("stableRuntimeVersion", stableRuntimeId.version().toString());
 
             vars.put("stableJarLocation", stableJarLocation);
         }
@@ -122,11 +121,11 @@ public class SiteRunner extends AbstractRunner {
             NId latestAppId = NWorkspace.of().getAppId();
 
             vars.put("latestApiId", latestApiId.toString());
-            vars.put("latestApiVersion", latestApiId.getVersion().toString());
+            vars.put("latestApiVersion", latestApiId.version().toString());
             vars.put("latestRuntimeId", latestRuntimeId.toString());
-            vars.put("latestRuntimeVersion", latestRuntimeId.getVersion().toString());
+            vars.put("latestRuntimeVersion", latestRuntimeId.version().toString());
             vars.put("latestAppId", latestAppId.toString());
-            vars.put("latestAppVersion", latestAppId.getVersion().toString());
+            vars.put("latestAppVersion", latestAppId.version().toString());
             vars.put("latestJarLocation", latestJarLocation);
         }
         {

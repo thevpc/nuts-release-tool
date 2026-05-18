@@ -140,7 +140,7 @@ public class NativeBuilder {
 //        }
 //        targetFolder.mkdirs();
         NPath distJar = evalSrcDistJar();
-        NPath installerJarPath = projectFolder.resolve("target").resolve(projectId.getArtifactId() + "-" + projectId.getVersion() + ".jar");
+        NPath installerJarPath = projectFolder.resolve("target").resolve(projectId.artifactId() + "-" + projectId.version() + ".jar");
 //        NPath f = targetFolder.resolve(distJar.getName());
         NPath f2 = dist.resolve(installerJarPath.name());
 //        installerJarPath.copyTo(f);
@@ -221,7 +221,7 @@ public class NativeBuilder {
         List<Class<?>> classes = new ArrayList<>();
         String relPath = packageName.replace('.', '/');
         for (NPath jarFile : jarFiles) {
-            try (JarInputStream jarStream = new JarInputStream(jarFile.getInputStream())) {
+            try (JarInputStream jarStream = new JarInputStream(jarFile.inputStream())) {
                 JarEntry entry;
                 while ((entry = jarStream.getNextJarEntry()) != null) {
                     String name = entry.getName();
@@ -268,9 +268,9 @@ public class NativeBuilder {
             entry.put("allPublicConstructors", true);
             config.add(entry);
         }
-        NVersion bootVersion = NWorkspace.of().getApiId().getVersion();
-        NVersion apiVersion = NWorkspace.of().getApiId().getVersion();
-        NVersion runtimeVersion = NWorkspace.of().getRuntimeId().getVersion();
+        NVersion bootVersion = NWorkspace.of().getApiId().version();
+        NVersion apiVersion = NWorkspace.of().getApiId().version();
+        NVersion runtimeVersion = NWorkspace.of().getRuntimeId().version();
         List<Class<?>> allClasses = getClassesFromJar(
                 new NPath[]{
                         NPath.ofUserHome().resolve(".m2/repository/net/thevpc/nuts/nuts-boot/" + bootVersion + "/nuts-boot-" + bootVersion + ".jar"),
@@ -721,20 +721,20 @@ public class NativeBuilder {
         //setProjectFolder(projectFolder);
         NDescriptor nDescriptor = NDescriptorParser.of().setDescriptorStyle(NDescriptorStyle.MAVEN).parse(getProjectFolder().resolve("pom.xml")).get();
         this.projectId = nDescriptor.getId();
-        if (preferredId != null && preferredId.getVersion().isBlank()) {
-            preferredId = preferredId.builder().setVersion(projectId.getVersion()).build();
+        if (preferredId != null && preferredId.version().isBlank()) {
+            preferredId = preferredId.builder().setVersion(projectId.version()).build();
         }
-        if (preferredId != null && NBlankable.isBlank(preferredId.getGroupId())) {
-            preferredId = preferredId.builder().setGroupId(projectId.getGroupId()).build();
+        if (preferredId != null && NBlankable.isBlank(preferredId.groupId())) {
+            preferredId = preferredId.builder().setGroupId(projectId.groupId()).build();
         }
-        if (preferredId != null && !NBlankable.isBlank(preferredId.getArtifactId())) {
-            setAppName(preferredId.getArtifactId());
+        if (preferredId != null && !NBlankable.isBlank(preferredId.artifactId())) {
+            setAppName(preferredId.artifactId());
         } else {
-            setAppName(projectId.getArtifactId());
+            setAppName(projectId.artifactId());
         }
         setDisplayName(nDescriptor.getName());
-        setAppId(projectId.getGroupId() + "." + projectId.getArtifactId());
-        setVersion(projectId.getVersion());
+        setAppId(projectId.groupId() + "." + projectId.artifactId());
+        setVersion(projectId.version());
         setJarPath(getProjectFolder().resolve("target").resolve(
                 NBlankable.isBlank(jarName) ?
                         evalName(null, null, ".jar")

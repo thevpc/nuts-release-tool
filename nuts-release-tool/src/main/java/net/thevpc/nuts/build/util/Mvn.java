@@ -22,9 +22,9 @@ public class Mvn {
     }
 
     public static String folder(NId id) {
-        String g = id.getGroupId().replace(".", "/");
-        String a = id.getArtifactId();
-        NVersion v = id.getVersion();
+        String g = id.groupId().replace(".", "/");
+        String a = id.artifactId();
+        NVersion v = id.version();
         if (v.isBlank()) {
             return g + "/" + a;
         } else {
@@ -42,9 +42,9 @@ public class Mvn {
     }
 
     public static String file(NId id, MvnArtifactType type) {
-        String g = id.getGroupId().replace(".", "/");
-        String a = id.getArtifactId();
-        NVersion v = id.getVersion();
+        String g = id.groupId().replace(".", "/");
+        String a = id.artifactId();
+        NVersion v = id.version();
         String ga = g + "/" + a;
         String gav = ga + "/" + v;
         String gavn = gav + "/" + a + "-" + v;

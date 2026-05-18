@@ -64,7 +64,7 @@ public class NReleaseUtils {
         if (!desc.isPresent()) {
             return false;
         }
-        if (!desc.get().getId().getArtifactId().equals("nuts-community-builder")) {
+        if (!desc.get().getId().artifactId().equals("nuts-community-builder")) {
             return false;
         }
         if (!currentDir.resolve("documentation/website").isDirectory()) {

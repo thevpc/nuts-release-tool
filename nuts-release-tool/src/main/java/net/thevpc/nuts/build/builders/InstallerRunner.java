@@ -121,7 +121,7 @@ public class InstallerRunner extends AbstractRunner {
                 r.addSupported(NativeBuilder.PackageType.NATIVE,NativeBuilder.PackageType.BIN,NativeBuilder.PackageType.JRE_BUNDLE);
             }
             r.setMainClass("net.thevpc.nuts.NutsApp");
-            r.setProjectFolder(context().nutsRootFolder.resolve("core/nuts-app-full"), null, "nuts-app-full-"+ NWorkspace.of().getRuntimeId().getVersion() +".jar");
+            r.setProjectFolder(context().nutsRootFolder.resolve("core/nuts-app-full"), null, "nuts-app-full-"+ NWorkspace.of().getRuntimeId().version() +".jar");
             r.setDist(sharedDistFolder);
             r.setProfilingArgs(new String[]{"--sandbox","--verbose"});
             r.build();

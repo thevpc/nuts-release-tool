@@ -29,7 +29,7 @@ public class NutsReleaseToolMain  {
                             new SiteRunner()
                     );
                     nutsBuildRunner.run(
-                            NApp.of().getCmdLine()
+                            NApp.of().cmdLine()
                     );
                 });
     }
