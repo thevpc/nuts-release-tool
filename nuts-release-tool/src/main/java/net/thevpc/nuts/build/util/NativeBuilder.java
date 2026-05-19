@@ -339,42 +339,42 @@ public class NativeBuilder {
 
     private BinPlatform currentPlatform() {
         NEnv e = NEnv.of();
-        switch (e.getOsFamily()) {
+        switch (e.osFamily()) {
             case UNIX:
             case LINUX: {
-                if (e.getArchFamily().name().endsWith("_64")) {
+                if (e.archFamily().name().endsWith("_64")) {
                     return BinPlatform.LINUX64;
                 }
-                if (e.getArchFamily().name().endsWith("_32")) {
+                if (e.archFamily().name().endsWith("_32")) {
                     return BinPlatform.LINUX32;
                 }
                 break;
             }
             case MACOS: {
-                if (e.getArchFamily().name().endsWith("_64")) {
+                if (e.archFamily().name().endsWith("_64")) {
                     return BinPlatform.MAC64;
                 }
                 break;
             }
 
             case WINDOWS: {
-                if (e.getArchFamily().name().endsWith("_64")) {
+                if (e.archFamily().name().endsWith("_64")) {
                     return BinPlatform.WINDOWS64;
                 }
-                if (e.getArchFamily().name().endsWith("_32")) {
+                if (e.archFamily().name().endsWith("_32")) {
                     return BinPlatform.WINDOWS32;
                 }
                 break;
             }
         }
-        throw new IllegalArgumentException("unsupported platform " + e.getOs() + " " + e.getArch());
+        throw new IllegalArgumentException("unsupported platform " + e.os() + " " + e.arch());
     }
 
     private BinPlatform evalCurrentBinPlatform() {
         NEnv z = NEnv.of();
-        switch (z.getOsFamily()) {
+        switch (z.osFamily()) {
             case LINUX: {
-                switch (z.getArchFamily()) {
+                switch (z.archFamily()) {
                     case X86_32:
                         return BinPlatform.LINUX32;
                     case X86_64:
@@ -383,7 +383,7 @@ public class NativeBuilder {
                 break;
             }
             case WINDOWS: {
-                switch (z.getArchFamily()) {
+                switch (z.archFamily()) {
                     case X86_32:
                         return BinPlatform.WINDOWS32;
                     case X86_64:
@@ -392,7 +392,7 @@ public class NativeBuilder {
                 break;
             }
             case MACOS: {
-                switch (z.getArchFamily()) {
+                switch (z.archFamily()) {
                     case X86_64:
                         return BinPlatform.MAC64;
                 }
@@ -400,7 +400,7 @@ public class NativeBuilder {
             }
         }
 
-        throw new AssertionError("Not supported " + z.getOsFamily() + " " + z.getArchFamily());
+        throw new AssertionError("Not supported " + z.osFamily() + " " + z.archFamily());
     }
 
     private List<NPath> createDistJPackageRPM() {

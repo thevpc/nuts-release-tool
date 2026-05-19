@@ -349,7 +349,7 @@ public class CompatRunner extends AbstractRunner {
     double parseCompatibility(NPath from) {
         String comptaClass = null;
         double comptaValue = 0.0;
-        try (BufferedReader br = from.getBufferedReader()) {
+        try (BufferedReader br = from.asBufferedReader()) {
             while (true) {
                 String line = br.readLine();
                 if (line == null) {

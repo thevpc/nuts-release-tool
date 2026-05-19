@@ -215,7 +215,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
         }
         NPath p = NPath.ofTempFile("temp");
         try (PrintStream out = p.getPrintStream()) {
-            try (BufferedReader br = path.getBufferedReader()) {
+            try (BufferedReader br = path.asBufferedReader()) {
                 String line;
                 while ((line = br.readLine()) != null) {
                     out.println(
