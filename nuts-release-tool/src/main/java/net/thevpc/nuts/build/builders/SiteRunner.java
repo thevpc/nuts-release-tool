@@ -88,7 +88,7 @@ public class SiteRunner extends AbstractRunner {
 //        String latestJarLocation = "https://raw.githubusercontent.com/thevpc/nuts-preview/master/net/thevpc/nuts/nuts/" + latestApiVersion + "/nuts-" + latestApiVersion + ".jar";
 //        String stableJarLocation = "https://repo.maven.apache.org/maven2/net/thevpc/nuts/nuts/" + stableApiVersion + "/nuts-" + stableApiVersion + ".jar";
 
-        String latestJarLocation = "https://maven.thevpc.net/" + Mvn.jar(NWorkspace.of().getAppId());
+        String latestJarLocation = "https://maven.thevpc.net/" + Mvn.jar(NWorkspace.of().appId());
 
         vars.putAll(context().vars);
         vars.put("buildTime", new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date()));
@@ -97,9 +97,9 @@ public class SiteRunner extends AbstractRunner {
             NAssert.requireNamedNonBlank(context().nutsLtsApiVersion, "nutsApiStableVersion");
             NAssert.requireNamedNonBlank(context().nutsLtsRuntimeVersion, "runtimeStableVersion");
 
-            NId stableApiId = NWorkspace.of().getApiId().builder().version(context().nutsLtsApiVersion).build();
-            NId stableAppId = NWorkspace.of().getAppId().builder().version(context().nutsLtsAppVersion).build();
-            NId stableRuntimeId = NWorkspace.of().getRuntimeId().builder().version(context().nutsLtsRuntimeVersion).build();
+            NId stableApiId = NWorkspace.of().apiId().builder().version(context().nutsLtsApiVersion).build();
+            NId stableAppId = NWorkspace.of().appId().builder().version(context().nutsLtsAppVersion).build();
+            NId stableRuntimeId = NWorkspace.of().runtimeId().builder().version(context().nutsLtsRuntimeVersion).build();
 
             String stableJarLocation = "https://maven.thevpc.net/" + Mvn.jar(stableAppId);
 
@@ -116,9 +116,9 @@ public class SiteRunner extends AbstractRunner {
         }
 
         {
-            NId latestApiId = NWorkspace.of().getApiId();
-            NId latestRuntimeId = NWorkspace.of().getRuntimeId();
-            NId latestAppId = NWorkspace.of().getAppId();
+            NId latestApiId = NWorkspace.of().apiId();
+            NId latestRuntimeId = NWorkspace.of().runtimeId();
+            NId latestAppId = NWorkspace.of().appId();
 
             vars.put("latestApiId", latestApiId.toString());
             vars.put("latestApiVersion", latestApiId.version().toString());
@@ -149,7 +149,7 @@ public class SiteRunner extends AbstractRunner {
                 .setTargetFolder(context().nutsRootFolder.toString());
         NSiteContext templateProject = new ProjectNSiteContext();
         templateProject.setVars(prepareVars());
-        NPath.of(Mvn.localMaven() + "/" + Mvn.jar(NWorkspace.of().getAppId()))
+        NPath.of(Mvn.localMaven() + "/" + Mvn.jar(NWorkspace.of().appId()))
                 .copyTo(context().websiteProjectFolder.resolve("src/resources/download/nuts-standard.jar")
                 );
         templateProject.run(config);
@@ -164,7 +164,7 @@ public class SiteRunner extends AbstractRunner {
                 .setTargetFolder(context().nutsRootFolder.resolve("docs").toString());
         NSiteContext templateProject = new ProjectNSiteContext();
         templateProject.setVars(prepareVars());
-        NPath.of(Mvn.localMaven() + "/" + Mvn.jar(NWorkspace.of().getAppId()))
+        NPath.of(Mvn.localMaven() + "/" + Mvn.jar(NWorkspace.of().appId()))
                 .copyTo(context().websiteProjectFolder.resolve("src/resources/nuts-standard.jar")
                 );
         templateProject.run(config);

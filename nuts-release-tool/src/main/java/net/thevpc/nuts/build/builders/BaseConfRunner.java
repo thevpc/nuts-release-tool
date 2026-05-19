@@ -60,7 +60,7 @@ public class BaseConfRunner extends AbstractRunner {
             switch (e.getKey()) {
                 case "trace": {
                     context().trace=e.getValue().asBooleanValue().orElse(context().trace);
-                    NSession.of().setTrace(context().trace);
+                    NSession.of().trace(context().trace);
                     break;
                 }
                 case "verbose": {

@@ -236,7 +236,7 @@ public class NativeBuilder {
                         }
                         try {
                             classes.add(Class.forName(className, false,
-                                    NWorkspace.of().getBootClassLoader()));
+                                    NWorkspace.of().bootClassLoader()));
                         } catch (ClassNotFoundException ignored) {
                             NOut.println(NMsg.ofC("[%s] skipped %s : %s", jarFile, className, ignored));
                         }
@@ -268,9 +268,9 @@ public class NativeBuilder {
             entry.put("allPublicConstructors", true);
             config.add(entry);
         }
-        NVersion bootVersion = NWorkspace.of().getApiId().version();
-        NVersion apiVersion = NWorkspace.of().getApiId().version();
-        NVersion runtimeVersion = NWorkspace.of().getRuntimeId().version();
+        NVersion bootVersion = NWorkspace.of().apiId().version();
+        NVersion apiVersion = NWorkspace.of().apiId().version();
+        NVersion runtimeVersion = NWorkspace.of().runtimeId().version();
         List<Class<?>> allClasses = getClassesFromJar(
                 new NPath[]{
                         NPath.ofUserHome().resolve(".m2/repository/net/thevpc/nuts/nuts-boot/" + bootVersion + "/nuts-boot-" + bootVersion + ".jar"),
