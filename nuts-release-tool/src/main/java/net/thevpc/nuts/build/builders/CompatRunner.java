@@ -115,8 +115,8 @@ public class CompatRunner extends AbstractRunner {
         for (int i = 0; i < allVersionsArray.length; i++) {
             for (int j = i + 1; j < allVersionsArray.length; j++) {
                 String compatId = allVersionsArray[i] + "_" + allVersionsArray[j];
-                boolean force = allVersionsArray[i].equals(Nuts.getVersion())
-                        || allVersionsArray[j].equals(Nuts.getVersion());
+                boolean force = allVersionsArray[i].equals(Nuts.version())
+                        || allVersionsArray[j].equals(Nuts.version());
                 if (readOnly) {
                     force = false;
                 }

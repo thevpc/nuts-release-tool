@@ -60,11 +60,11 @@ public class NReleaseUtils {
         if (!currentDir.resolve("pom.xml").isRegularFile()) {
             return false;
         }
-        NOptional<NDescriptor> desc = NDescriptorParser.of().setDescriptorStyle(NDescriptorStyle.MAVEN).parse(currentDir.resolve("pom.xml"));
+        NOptional<NDescriptor> desc = NDescriptorParser.of().descriptorStyle(NDescriptorStyle.MAVEN).parse(currentDir.resolve("pom.xml"));
         if (!desc.isPresent()) {
             return false;
         }
-        if (!desc.get().getId().artifactId().equals("nuts-community-builder")) {
+        if (!desc.get().id().artifactId().equals("nuts-community-builder")) {
             return false;
         }
         if (!currentDir.resolve("documentation/website").isDirectory()) {

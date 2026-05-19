@@ -572,24 +572,24 @@ public class NativeBuilder {
                     .copyTo(packrbin);
         }
         NExec.of().system()
-                .command("java")
-                .command("-jar")
-                .command(packrbin)
-                .command("--platform")
-                .command(platform.id())
-                .command("--jdk")
-                .command(jre)
-                .command("--useZgcIfSupportedOs")
-                .command("--executable")
-                .command(evalName(platform, null, null))
-                .command("--classpath")
-                .command(evalSrcDistJar())
-                .command("--mainclass")
-                .command(NAssert.requireNamedNonBlank(mainClass, "mainClass"))
-                .command("--vmargs")
-                .command("Xmx1G")
-                .command("--output")
-                .command(f)
+                .addCommand("java")
+                .addCommand("-jar")
+                .addCommand(packrbin)
+                .addCommand("--platform")
+                .addCommand(platform.id())
+                .addCommand("--jdk")
+                .addCommand(jre)
+                .addCommand("--useZgcIfSupportedOs")
+                .addCommand("--executable")
+                .addCommand(evalName(platform, null, null))
+                .addCommand("--classpath")
+                .addCommand(evalSrcDistJar())
+                .addCommand("--mainclass")
+                .addCommand(NAssert.requireNamedNonBlank(mainClass, "mainClass"))
+                .addCommand("--vmargs")
+                .addCommand("Xmx1G")
+                .addCommand("--output")
+                .addCommand(f)
                 .failFast(true)
                 .run();
         NPath res = zipFolder(f, platform, "with-java");
@@ -719,20 +719,20 @@ public class NativeBuilder {
     public NativeBuilder setProjectFolder(NPath projectFolder, NId preferredId, String jarName) {
         this.projectFolder = projectFolder;
         //setProjectFolder(projectFolder);
-        NDescriptor nDescriptor = NDescriptorParser.of().setDescriptorStyle(NDescriptorStyle.MAVEN).parse(getProjectFolder().resolve("pom.xml")).get();
-        this.projectId = nDescriptor.getId();
+        NDescriptor nDescriptor = NDescriptorParser.of().descriptorStyle(NDescriptorStyle.MAVEN).parse(getProjectFolder().resolve("pom.xml")).get();
+        this.projectId = nDescriptor.id();
         if (preferredId != null && preferredId.version().isBlank()) {
-            preferredId = preferredId.builder().setVersion(projectId.version()).build();
+            preferredId = preferredId.builder().version(projectId.version()).build();
         }
         if (preferredId != null && NBlankable.isBlank(preferredId.groupId())) {
-            preferredId = preferredId.builder().setGroupId(projectId.groupId()).build();
+            preferredId = preferredId.builder().groupId(projectId.groupId()).build();
         }
         if (preferredId != null && !NBlankable.isBlank(preferredId.artifactId())) {
             setAppName(preferredId.artifactId());
         } else {
             setAppName(projectId.artifactId());
         }
-        setDisplayName(nDescriptor.getName());
+        setDisplayName(nDescriptor.name());
         setAppId(projectId.groupId() + "." + projectId.artifactId());
         setVersion(projectId.version());
         setJarPath(getProjectFolder().resolve("target").resolve(

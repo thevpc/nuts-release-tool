@@ -87,8 +87,8 @@ public class InstallerRunner extends AbstractRunner {
         r.setCopyright("(c) 2018-"+ LocalDate.now().getYear() +" thevpc");
         r.setIcons(Arrays.asList(context().nutsRootFolder.resolve("documentation/media/nuts-icon.icns")));
 
-        NPath sharedDistFolder = context().nutsRootFolder.resolve("installers/dist").resolve(Nuts.getVersion().toString());
-        NPath thevpcNutsVer = remoteTheVpcNutsPath().resolve(Nuts.getVersion().toString());
+        NPath sharedDistFolder = context().nutsRootFolder.resolve("installers/dist").resolve(Nuts.version().toString());
+        NPath thevpcNutsVer = remoteTheVpcNutsPath().resolve(Nuts.version().toString());
 
 
 //        NPath thevpcNutsVerWithSsh = NPath.of(NConnectionString.of(context().getRemoteTheVpcSshConnection().get()).builder().setProtocol("ssh").setPath(thevpcNutsVer.toString()).build());

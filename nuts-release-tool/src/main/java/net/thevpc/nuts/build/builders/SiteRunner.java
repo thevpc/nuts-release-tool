@@ -97,9 +97,9 @@ public class SiteRunner extends AbstractRunner {
             NAssert.requireNamedNonBlank(context().nutsLtsApiVersion, "nutsApiStableVersion");
             NAssert.requireNamedNonBlank(context().nutsLtsRuntimeVersion, "runtimeStableVersion");
 
-            NId stableApiId = NWorkspace.of().getApiId().builder().setVersion(context().nutsLtsApiVersion).build();
-            NId stableAppId = NWorkspace.of().getAppId().builder().setVersion(context().nutsLtsAppVersion).build();
-            NId stableRuntimeId = NWorkspace.of().getRuntimeId().builder().setVersion(context().nutsLtsRuntimeVersion).build();
+            NId stableApiId = NWorkspace.of().getApiId().builder().version(context().nutsLtsApiVersion).build();
+            NId stableAppId = NWorkspace.of().getAppId().builder().version(context().nutsLtsAppVersion).build();
+            NId stableRuntimeId = NWorkspace.of().getRuntimeId().builder().version(context().nutsLtsRuntimeVersion).build();
 
             String stableJarLocation = "https://maven.thevpc.net/" + Mvn.jar(stableAppId);
 
