@@ -290,9 +290,9 @@ public class CompatRunner extends AbstractRunner {
     public static String background(double comp) {
         comp = Math.max(0, Math.min(1, comp)); // clamp
 
-        int r = (int) (BAD.getRed() + (GOOD.getRed() - BAD.getRed()) * comp);
-        int g = (int) (BAD.getGreen() + (GOOD.getGreen() - BAD.getGreen()) * comp);
-        int b = (int) (BAD.getBlue() + (GOOD.getBlue() - BAD.getBlue()) * comp);
+        int r = (int) (BAD.red() + (GOOD.red() - BAD.red()) * comp);
+        int g = (int) (BAD.green() + (GOOD.green() - BAD.green()) * comp);
+        int b = (int) (BAD.blue() + (GOOD.blue() - BAD.blue()) * comp);
 
         return String.format("#%02x%02x%02x", r, g, b);
     }
@@ -332,7 +332,7 @@ public class CompatRunner extends AbstractRunner {
                         NPath.ofUserHome().resolve(NMsg.ofV(".m2/repository/net/thevpc/nuts/nuts/$v1/nuts-$v1.jar", v -> to.toString()).toString()).toString()
                 )
                 .directory(context().websiteProjectFolder.resolve("src/main"));
-        String sout = e.getGrabbedAllString();
+        String sout = e.grabbedAll();
         int code = e.exitCode();
         if (code == 0) {
             // no change

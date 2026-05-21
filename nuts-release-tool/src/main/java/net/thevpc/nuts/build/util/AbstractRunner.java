@@ -192,7 +192,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
                 .system()
                 .directory(CURRENT_FOLDER)
                 .run()
-                .getGrabbedAllString();
+                .grabbedAll();
     }
 
     public void copyWithHeader(NPath from, NPath to, String header) {
