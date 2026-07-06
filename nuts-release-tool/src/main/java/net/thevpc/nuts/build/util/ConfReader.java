@@ -30,7 +30,7 @@ public class ConfReader {
                 String tline = line.trim();
                 if (tline.length() > 0 && !tline.startsWith("#")) {
                     if (line.endsWith("\\")) {
-                        String timmedStart = NStringUtils.trimLeft(line);
+                        String timmedStart = NStringUtils.stripLeft(line);
                         String remainingLine = timmedStart.substring(0, timmedStart.length() - 1);
                         if (timmedStart.length() > 0) {
                             lastValue.set(new StringBuilder(remainingLine));

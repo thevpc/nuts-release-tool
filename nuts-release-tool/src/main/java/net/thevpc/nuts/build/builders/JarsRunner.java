@@ -2,7 +2,6 @@ package net.thevpc.nuts.build.builders;
 
 import net.thevpc.nuts.artifact.NId;
 import net.thevpc.nuts.build.util.AbstractRunner;
-import net.thevpc.nuts.build.util.NReleaseUtils;
 import net.thevpc.nuts.cmdline.NArg;
 import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.elem.NElement;
@@ -59,7 +58,7 @@ public class JarsRunner extends AbstractRunner {
     @Override
     public void configureAfterOptions() {
         context().setRemoteTheVpcSshConnection(
-                NStringUtils.firstNonBlankTrimmed(NMsg.ofV(
+                NStringUtils.firstNonBlankStripped(NMsg.ofV(
                         context().vars.get("PROD_SSH_CONNECTION")
                         , context().varMapper()).toString(), context().getRemoteTheVpcSshUser() + "@thevpc.net")
         );
