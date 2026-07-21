@@ -170,7 +170,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
         //}
 //        String out =
         NExec.of()
-                .addCommand(cmd)
+                .command(cmd)
                 .failFast(true)
                 .system()
                 .directory(CURRENT_FOLDER)
@@ -187,7 +187,7 @@ public abstract class AbstractRunner implements NCmdLineConfigurable {
             traceCmd(cmd);
         }
         return NExec.of()
-                .addCommand(cmd)
+                .command(cmd)
                 .failFast(true)
                 .system()
                 .directory(CURRENT_FOLDER)

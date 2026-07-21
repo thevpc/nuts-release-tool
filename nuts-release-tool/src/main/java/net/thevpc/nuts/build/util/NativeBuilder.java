@@ -174,12 +174,12 @@ public class NativeBuilder {
         NExec.of().system()
                 .env("JAVA_HOME", graalvmHome)
                 .directory(evalSrcDist())
-                .addCommand(graalvmHome + "/bin/java")
-                .addCommand("-agentlib:native-image-agent=config-merge-dir=" + srcDistMetaInfNativeImage)
-                .addCommand("-DEnableGraalVM=true")
-                .addCommand("-jar")
-                .addCommand(newJarPath)
-                .addCommand(profilingArgs)
+                .command(graalvmHome + "/bin/java")
+                .command("-agentlib:native-image-agent=config-merge-dir=" + srcDistMetaInfNativeImage)
+                .command("-DEnableGraalVM=true")
+                .command("-jar")
+                .command(newJarPath)
+                .command(profilingArgs)
                 .failFast(true)
                 .run();
 
@@ -187,29 +187,29 @@ public class NativeBuilder {
         NExec.of().system()
                 .env("JAVA_HOME", graalvmHome)
                 .directory(evalSrcDist())
-                .addCommand(graalvmHome + "/bin/native-image")
-                .addCommand("--enable-http")
-                .addCommand("--enable-https")
-                .addCommand("--enable-https")
-                .addCommand("--no-fallback")
-                .addCommand("-O3")
-                .addCommand("-H:+UnlockExperimentalVMOptions")
-                .addCommand("-H:ConfigurationFileDirectories=" + srcDistMetaInfNativeImage)
-                .addCommand(
+                .command(graalvmHome + "/bin/native-image")
+                .command("--enable-http")
+                .command("--enable-https")
+                .command("--enable-https")
+                .command("--no-fallback")
+                .command("-O3")
+                .command("-H:+UnlockExperimentalVMOptions")
+                .command("-H:ConfigurationFileDirectories=" + srcDistMetaInfNativeImage)
+                .command(
                         (srcDistMetaInfNativeImage.resolve("my-reflect-config.json")).isRegularFile() ?
                                 "-H:ReflectionConfigurationFiles=" + srcDistMetaInfNativeImage.resolve("my-reflect-config.json")
                                 : null
                 )
-                .addCommand(
+                .command(
                         (srcDistMetaInfNativeImage.resolve("my-resource-config.json")).isRegularFile() ?
                                 "-H:ResourceConfigurationFiles=" + srcDistMetaInfNativeImage.resolve("my-resource-config.json")
                                 : null
                 )
-                .addCommand("-Djava.awt.headless=false")
-                .addCommand("-DEnableGraalVM=true")
-                .addCommand("-jar")
-                .addCommand(newJarPath)
-                .addCommand(f)
+                .command("-Djava.awt.headless=false")
+                .command("-DEnableGraalVM=true")
+                .command("-jar")
+                .command(newJarPath)
+                .command(f)
                 .failFast(true)
                 .run();
         ret.add(zipFolder(rootDistLinux64Bin, platform, "bin"));
@@ -328,10 +328,10 @@ public class NativeBuilder {
         NPath fzip = folder.resolveSibling(evalName(platform, discriminator, ".zip"));
         NExec.of().system()
                 .directory(folder.parent())
-                .addCommand("zip")
-                .addCommand("-r")
-                .addCommand(fzip)
-                .addCommand(folder.name())
+                .command("zip")
+                .command("-r")
+                .command(fzip)
+                .command(folder.name())
                 .failFast(true)
                 .run();
         return fzip;
@@ -412,21 +412,21 @@ public class NativeBuilder {
             targetFolder.deleteTree();
         }
         NExec.of().system()
-                .addCommand(jpackageHome + "/bin/jpackage")
-                .addCommand("--name")
-                .addCommand(appName)
-                .addCommand("--description")
-                .addCommand(displayName)
-                .addCommand("--vendor")
-                .addCommand(vendor)
-                .addCommand("--app-version")
-                .addCommand(version.toString())
-                .addCommand("--input")
-                .addCommand(evalSrcDist())
-                .addCommand("--main-jar")
-                .addCommand(evalName(null, null, ".jar"))
-                .addCommand("--dest")
-                .addCommand(targetFolder)
+                .command(jpackageHome + "/bin/jpackage")
+                .command("--name")
+                .command(appName)
+                .command("--description")
+                .command(displayName)
+                .command("--vendor")
+                .command(vendor)
+                .command("--app-version")
+                .command(version.toString())
+                .command("--input")
+                .command(evalSrcDist())
+                .command("--main-jar")
+                .command(evalName(null, null, ".jar"))
+                .command("--dest")
+                .command(targetFolder)
                 .failFast(true)
                 .run();
         NPath rpmFile = targetFolder.list().stream().filter(x -> x.name().startsWith(evalName(null, null, null)))
@@ -447,8 +447,8 @@ public class NativeBuilder {
         NPath jar2appBase = NPath.ofTempFolder("jar2app");
         NExec.of().system()
                 .directory(jar2appBase)
-                .addCommand("git", "clone")
-                .addCommand("https://github.com/Jorl17/jar2app.git")
+                .command("git", "clone")
+                .command("https://github.com/Jorl17/jar2app.git")
                 .failFast(true)
                 .run();
         NPath jar2appFolderSrc = jar2appBase.resolve("jar2app");
@@ -461,8 +461,8 @@ public class NativeBuilder {
 //                jar2appFolderBin
 //        );
 //        jar2appFolderBin=jar2appFolderBin.setUserTemporary(true);
-        NExec.of().system().directory(jar2appFolderSrc).failFast(true).addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app_basefiles").toString()).run();
-        NExec.of().system().directory(jar2appFolderSrc).failFast(true).addCommand("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app").toString()).run();
+        NExec.of().system().directory(jar2appFolderSrc).failFast(true).command("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app_basefiles").toString()).run();
+        NExec.of().system().directory(jar2appFolderSrc).failFast(true).command("chmod", "-R", "a+rw", jar2appFolderSrc.resolve("jar2app").toString()).run();
         return jar2appFolderSrc;
     }
 
@@ -480,22 +480,22 @@ public class NativeBuilder {
         NPath jar2AppRoot = installJar2App();
         NExec.of().system()
                 .directory(jar2AppRoot)
-                .addCommand("python3")
-                .addCommand("./jar2app")
-                .addCommand("--copyright=" + copyright)
-                .addCommand("--short-version=" + version)
-                .addCommand("--version=" + version)
-                .addCommand(
+                .command("python3")
+                .command("./jar2app")
+                .command("--copyright=" + copyright)
+                .command("--short-version=" + version)
+                .command("--version=" + version)
+                .command(
                         icons == null ? null :
                                 icons.stream().filter(x -> x.name().endsWith(".icns"))
                                 .map(x -> "--icon=" + x)
                                 .findFirst().orElse(null)
                 )
-                .addCommand("--bundle-identifier=" + appId)
-                .addCommand("--display-name=" + displayName)
-                .addCommand("--name=" + this.evalName(platform, null, null))
-                .addCommand(evalSrcDistJar())
-                .addCommand(target)
+                .command("--bundle-identifier=" + appId)
+                .command("--display-name=" + displayName)
+                .command("--name=" + this.evalName(platform, null, null))
+                .command(evalSrcDistJar())
+                .command(target)
                 .failFast(true)
                 .run();
         NPath base = target.resolveSibling(target.name() + ".app");
@@ -572,24 +572,24 @@ public class NativeBuilder {
                     .copyTo(packrbin);
         }
         NExec.of().system()
-                .addCommand("java")
-                .addCommand("-jar")
-                .addCommand(packrbin)
-                .addCommand("--platform")
-                .addCommand(platform.id())
-                .addCommand("--jdk")
-                .addCommand(jre)
-                .addCommand("--useZgcIfSupportedOs")
-                .addCommand("--executable")
-                .addCommand(evalName(platform, null, null))
-                .addCommand("--classpath")
-                .addCommand(evalSrcDistJar())
-                .addCommand("--mainclass")
-                .addCommand(NAssert.requireNamedNonBlank(mainClass, "mainClass"))
-                .addCommand("--vmargs")
-                .addCommand("Xmx1G")
-                .addCommand("--output")
-                .addCommand(f)
+                .command("java")
+                .command("-jar")
+                .command(packrbin)
+                .command("--platform")
+                .command(platform.id())
+                .command("--jdk")
+                .command(jre)
+                .command("--useZgcIfSupportedOs")
+                .command("--executable")
+                .command(evalName(platform, null, null))
+                .command("--classpath")
+                .command(evalSrcDistJar())
+                .command("--mainclass")
+                .command(NAssert.requireNamedNonBlank(mainClass, "mainClass"))
+                .command("--vmargs")
+                .command("Xmx1G")
+                .command("--output")
+                .command(f)
                 .failFast(true)
                 .run();
         NPath res = zipFolder(f, platform, "with-java");
@@ -623,7 +623,7 @@ public class NativeBuilder {
 
     private NPath createDigest256(NPath from) {
         NPath to = from.resolveSibling(from.name() + ".sha256");
-        to.writeString(NDigest.of().sha256().addSource(from).computeManifestString());
+        to.writeString(NDigest.of().sha256().source(from).computeManifestString());
         return to;
     }
 
