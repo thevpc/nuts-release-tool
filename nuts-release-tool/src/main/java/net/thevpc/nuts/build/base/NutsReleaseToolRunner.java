@@ -5,7 +5,7 @@ import net.thevpc.nuts.io.NOut;
 import net.thevpc.nuts.build.util.AbstractRunner;
 import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.cmdline.NCmdLineConfigurable;
-import net.thevpc.nuts.time.NChronometer;
+import net.thevpc.nuts.mon.NChronometer;
 import net.thevpc.nuts.text.NMsg;
 
 public class NutsReleaseToolRunner {
