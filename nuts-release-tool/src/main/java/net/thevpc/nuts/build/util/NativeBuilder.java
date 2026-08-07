@@ -10,7 +10,7 @@ import net.thevpc.nuts.io.NPath;
 import net.thevpc.nuts.platform.NEnv;
 import net.thevpc.nuts.text.NMsg;
 import net.thevpc.nuts.text.NMsgParam;
-import net.thevpc.nuts.util.NMaps;
+import net.thevpc.nuts.collections.NMaps;
 import net.thevpc.nuts.util.*;
 
 import java.io.IOException;

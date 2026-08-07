@@ -16,7 +16,7 @@ import net.thevpc.nuts.elem.NElement;
 import net.thevpc.nuts.io.NPath;
 import net.thevpc.nsite.context.NSiteContext;
 import net.thevpc.nsite.context.ProjectNSiteContext;
-import net.thevpc.nuts.util.NMaps;
+import net.thevpc.nuts.collections.NMaps;
 import net.thevpc.nsite.NSiteProjectConfig;
 import net.thevpc.nuts.util.NAssert;
 import net.thevpc.nuts.text.NMsg;

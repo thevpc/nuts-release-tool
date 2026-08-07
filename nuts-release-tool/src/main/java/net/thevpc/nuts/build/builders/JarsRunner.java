@@ -9,6 +9,7 @@ import net.thevpc.nuts.text.NMsg;
 import net.thevpc.nuts.util.*;
 
 import net.thevpc.nuts.build.util.Mvn;
+import net.thevpc.nuts.collections.NMaps;
 
 import java.util.Map;
 
