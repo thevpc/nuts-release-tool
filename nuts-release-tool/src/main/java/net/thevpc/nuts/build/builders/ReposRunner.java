@@ -26,6 +26,10 @@ public class ReposRunner extends AbstractRunner {
     public void configureBeforeOptions(NCmdLine cmdLine) {
         for (Map.Entry<String, NElement> e : context().loadConfigNamedPairs().entrySet()) {
             switch (e.getKey()) {
+                case "build-repos": {
+                    repoPublic=repoPreview=e.getValue().asBooleanValue().orElse(repoPreview);
+                    break;
+                }
                 case "build-repo-nuts-preview": {
                     repoPreview=e.getValue().asBooleanValue().orElse(repoPreview);
                     break;

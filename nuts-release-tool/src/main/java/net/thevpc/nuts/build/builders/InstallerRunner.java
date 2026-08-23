@@ -15,7 +15,9 @@ import net.thevpc.nuts.io.NPath;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author vpc
@@ -32,8 +34,7 @@ public class InstallerRunner extends AbstractRunner {
     NamedStringParam INSTALLER_JRE8_WINDOWS32 = NParams.ofString("INSTALLER_JRE8_WINDOWS32", null);
     NamedStringParam INSTALLER_JRE8_MAC64 = NParams.ofString("INSTALLER_JRE8_MAC64", null);
     boolean buildNative = false;
-    boolean buildInstaller = false;
-    boolean buildBin = false;
+    boolean buildJars = false;
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
@@ -43,12 +44,8 @@ public class InstallerRunner extends AbstractRunner {
                     buildNative=e.getValue().asBooleanValue().orElse(buildNative);
                     break;
                 }
-                case "build-installer": {
-                    buildInstaller=e.getValue().asBooleanValue().orElse(buildInstaller);
-                    break;
-                }
-                case "build-bin": {
-                    buildBin=e.getValue().asBooleanValue().orElse(buildBin);
+                case "build-jars": {
+                    buildJars =e.getValue().asBooleanValue().orElse(buildJars);
                     break;
                 }
             }
@@ -93,50 +90,52 @@ public class InstallerRunner extends AbstractRunner {
 
 //        NPath thevpcNutsVerWithSsh = NPath.of(NConnectionString.of(context().getRemoteTheVpcSshConnection().get()).builder().setProtocol("ssh").setPath(thevpcNutsVer.toString()).build());
 //        NPathType type = thevpcNutsVerWithSsh.type();
-        if (buildInstaller) {
-            r.setSupported(NativeBuilder.PackageType.PORTABLE);
-            if(buildNative){
-                r.addSupported(NativeBuilder.PackageType.NATIVE,NativeBuilder.PackageType.BIN,NativeBuilder.PackageType.JRE_BUNDLE);
-            }
-            r.setMainClass("net.thevpc.nuts.installer.NutsInstaller");
-            r.setProjectFolder(context().nutsRootFolder.resolve("installers/nuts-installer"), null, null);
-            r.setDist(sharedDistFolder);
-            r.setProfilingArgs(new String[]{"--build-native-profiling"});
-            r.build();
-            if (context().publish) {
-                remoteMkdirs(thevpcNutsVer.toString());
+        Set<NativeBuilder.PackageType> toBuild=new HashSet<>();
+        if(buildJars) {
+            toBuild.add(NativeBuilder.PackageType.PORTABLE);
+        }
+        if(buildNative) {
+            toBuild.add(NativeBuilder.PackageType.NATIVE);
+            toBuild.add(NativeBuilder.PackageType.BIN);
+            toBuild.add(NativeBuilder.PackageType.JRE_BUNDLE);
+        }
+        if (!toBuild.isEmpty()) {
+            r.setSupported(toBuild.toArray(new NativeBuilder.PackageType[0]));
+            {
+                r.setMainClass("net.thevpc.nuts.installer.NutsInstaller");
+                r.setProjectFolder(context().nutsRootFolder.resolve("installers/nuts-installer"), null, null);
+                r.setDist(sharedDistFolder);
+                r.setProfilingArgs(new String[]{"--build-native-profiling"});
+                r.build();
+                if (context().publish) {
+                    remoteMkdirs(thevpcNutsVer.toString());
 //                thevpcNutsVerWithSsh.mkdirs();
-                for (NPath nPath : r.getGeneratedFiles()) {
-                    upload(nPath, thevpcNutsVer.resolve(nPath.name()).toString());
+                    for (NPath nPath : r.getGeneratedFiles()) {
+                        upload(nPath, thevpcNutsVer.resolve(nPath.name()).toString());
+                    }
+                    for (NPath nPath : r.getGeneratedDigestFiles()) {
+                        upload(nPath, thevpcNutsVer.resolve(nPath.name()).toString());
+                    }
                 }
-                for (NPath nPath : r.getGeneratedDigestFiles()) {
-                    upload(nPath, thevpcNutsVer.resolve(nPath.name()).toString());
+            }
+            {
+                r.setMainClass("net.thevpc.nuts.NutsApp");
+                r.setProjectFolder(context().nutsRootFolder.resolve("core/nuts-app-full"), null, "nuts-app-full-"+ NWorkspace.of().runtimeId().version() +".jar");
+                r.setDist(sharedDistFolder);
+                r.setProfilingArgs(new String[]{"--sandbox","--verbose"});
+                r.build();
+                if (context().publish) {
+                    remoteMkdirs(thevpcNutsVer.toString());
+//                thevpcNutsVerWithSsh.mkdirs();
+                    for (NPath nPath : r.getGeneratedFiles()) {
+                        upload(nPath, thevpcNutsVer.resolve(nPath.name()).toString());
+                    }
+                    for (NPath nPath : r.getGeneratedDigestFiles()) {
+                        upload(nPath, thevpcNutsVer.resolve(nPath.name()).toString());
+                    }
                 }
             }
         }
-
-        if (buildBin) {
-            r.setSupported(NativeBuilder.PackageType.PORTABLE);
-            if(buildNative){
-                r.addSupported(NativeBuilder.PackageType.NATIVE,NativeBuilder.PackageType.BIN,NativeBuilder.PackageType.JRE_BUNDLE);
-            }
-            r.setMainClass("net.thevpc.nuts.NutsApp");
-            r.setProjectFolder(context().nutsRootFolder.resolve("core/nuts-app-full"), null, "nuts-app-full-"+ NWorkspace.of().runtimeId().version() +".jar");
-            r.setDist(sharedDistFolder);
-            r.setProfilingArgs(new String[]{"--sandbox","--verbose"});
-            r.build();
-            if (context().publish) {
-                remoteMkdirs(thevpcNutsVer.toString());
-//                thevpcNutsVerWithSsh.mkdirs();
-                for (NPath nPath : r.getGeneratedFiles()) {
-                    upload(nPath, thevpcNutsVer.resolve(nPath.name()).toString());
-                }
-                for (NPath nPath : r.getGeneratedDigestFiles()) {
-                    upload(nPath, thevpcNutsVer.resolve(nPath.name()).toString());
-                }
-            }
-        }
-
     }
 
 

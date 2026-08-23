@@ -18,8 +18,6 @@ public class JarsRunner extends AbstractRunner {
     public boolean updateVersion = false;
     public Boolean productionMode = null;
 
-    public boolean buildJars = false;
-
     public JarsRunner() {
         super();
     }
