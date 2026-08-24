@@ -66,7 +66,7 @@ public class BaseConfRunner extends AbstractRunner {
                 case "verbose": {
                     context().verbose=e.getValue().asBooleanValue().orElse(context().verbose);
                     if(context().verbose) {
-                        NSession.of().setLogTermLevel(Level.FINEST);
+                        NSession.of().logTermLevel(Level.FINEST);
                     }
                     break;
                 }

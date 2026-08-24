@@ -1,20 +1,20 @@
 package net.thevpc.nuts.build;
 
+import net.thevpc.nuts.app.NApplication;
 import net.thevpc.nuts.app.NApp;
-import net.thevpc.nuts.app.NAppDefinition;
-import net.thevpc.nuts.app.NAppRunner;
+import net.thevpc.nuts.app.NAppRun;
 import net.thevpc.nuts.build.base.NutsReleaseToolRunner;
 import net.thevpc.nuts.build.builders.*;
 import net.thevpc.nuts.core.NSession;
 
-@NAppDefinition
+@NApp
 public class NutsReleaseToolMain  {
 
     public static void main(String[] args) {
-        NApp.builder(args).run();
+        NApplication.builder(args).run();
     }
 
-    @NAppRunner
+    @NAppRun
     public void run() {
         NSession session = NSession.of();
         //always yes!!
@@ -29,7 +29,7 @@ public class NutsReleaseToolMain  {
                             new SiteRunner()
                     );
                     nutsBuildRunner.run(
-                            NApp.of().cmdLine()
+                            NApplication.of().cmdLine()
                     );
                 });
     }
