@@ -137,6 +137,16 @@ public class SiteRunner extends AbstractRunner {
             vars.put("runtimeId", vars.get("latestRuntimeId"));
             vars.put("runtimeVersion", vars.get("latestRuntimeVersion"));
         }
+        {
+            NPath versionsFile = context().websiteProjectFolder.resolve("src/include/versions/versions.json");
+            if (versionsFile.exists()) {
+                try {
+                    vars.put("docVersionsFile", versionsFile.toString());
+                } catch (Exception ex) {
+                    // ignore
+                }
+            }
+        }
         return vars;
     }
 
