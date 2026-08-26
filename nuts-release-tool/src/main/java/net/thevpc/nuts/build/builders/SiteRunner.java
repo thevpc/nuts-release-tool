@@ -65,7 +65,9 @@ public class SiteRunner extends AbstractRunner {
         echoV("**** $v (nuts)...", NMaps.of("v", NMsg.ofStyledKeyword("build-nuts-site")));
         runGithubRepository();
         runGithubDocumentationWebsite();
-        runCopyThevpcNetScripts();
+        if(context().publish){
+            runCopyThevpcNetScripts();
+        }
     }
 
     private void runCopyThevpcNetScripts() {
