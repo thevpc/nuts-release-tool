@@ -35,9 +35,9 @@ public class NutsBuildRunnerContext {
     public NPath confFileTson;
     public String nutsDebugArg = null;
 
-    public String nutsLtsApiVersion = null;
-    public String nutsLtsAppVersion = null;
-    public String nutsLtsRuntimeVersion = null;
+    public String nutsStableApiVersion = null;
+    public String nutsStableAppVersion = null;
+    public String nutsStableRuntimeVersion = null;
     private String remoteTheVpcSshConnection;
     public NElement confRoot;
 
@@ -84,13 +84,13 @@ public class NutsBuildRunnerContext {
                         return getRemoteTheVpcSshUser();
                     }
                     case "stableApiVersion": {
-                        return nutsLtsApiVersion;
+                        return nutsStableApiVersion;
                     }
                     case "stableAppVersion": {
-                        return nutsLtsAppVersion;
+                        return nutsStableAppVersion;
                     }
                     case "stableRuntimeVersion": {
-                        return nutsLtsRuntimeVersion;
+                        return nutsStableRuntimeVersion;
                     }
                     case "root":
                     case "rootFolder":

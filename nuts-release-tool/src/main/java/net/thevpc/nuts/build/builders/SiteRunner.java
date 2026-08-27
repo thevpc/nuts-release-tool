@@ -13,18 +13,22 @@ import net.thevpc.nuts.cmdline.NCmdLine;
 import net.thevpc.nuts.command.NExec;
 import net.thevpc.nuts.core.NWorkspace;
 import net.thevpc.nuts.elem.NElement;
+import net.thevpc.nuts.elem.NElementReader;
 import net.thevpc.nuts.io.NPath;
 import net.thevpc.nsite.context.NSiteContext;
 import net.thevpc.nsite.context.ProjectNSiteContext;
 import net.thevpc.nuts.collections.NMaps;
 import net.thevpc.nsite.NSiteProjectConfig;
+import net.thevpc.nuts.io.NPathOption;
 import net.thevpc.nuts.util.NAssert;
 import net.thevpc.nuts.text.NMsg;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author vpc
@@ -42,12 +46,13 @@ public class SiteRunner extends AbstractRunner {
         for (Map.Entry<String, NElement> e : context().loadConfigNamedPairs().entrySet()) {
             switch (e.getKey()) {
                 case "build-site": {
-                    context().buildSite=e.getValue().asBooleanValue().orElse(context().buildSite);
+                    context().buildSite = e.getValue().asBooleanValue().orElse(context().buildSite);
                     break;
                 }
             }
         }
     }
+
     @Override
     public boolean configureFirst(NCmdLine cmdLine) {
         NArg c = cmdLine.peek().orNull();
@@ -63,24 +68,26 @@ public class SiteRunner extends AbstractRunner {
 
     private void runSite() {
         echoV("**** $v (nuts)...", NMaps.of("v", NMsg.ofStyledKeyword("build-nuts-site")));
+        prepareJars();
+        prepareVersions();
         runGithubRepository();
         runGithubDocumentationWebsite();
-        if(context().publish){
+        if (context().publish) {
             runCopyThevpcNetScripts();
         }
     }
 
     private void runCopyThevpcNetScripts() {
-        String REMOTE_NUTS_THEVPC_DEPLOY_PATH=context().getVar("REMOTE_NUTS_THEVPC_DEPLOY_PATH").get();
-        if(!REMOTE_NUTS_THEVPC_DEPLOY_PATH.endsWith("/")){
-            REMOTE_NUTS_THEVPC_DEPLOY_PATH+="/";
+        String REMOTE_NUTS_THEVPC_DEPLOY_PATH = context().getVar("REMOTE_NUTS_THEVPC_DEPLOY_PATH").get();
+        if (!REMOTE_NUTS_THEVPC_DEPLOY_PATH.endsWith("/")) {
+            REMOTE_NUTS_THEVPC_DEPLOY_PATH += "/";
         }
 
 
         NExec.ofSystem(
                 "rsync", "-avz", "--progress", "-e", "ssh", "--info=progress2", "--human-readable",
-                context().nutsRootFolder+"/scripts/thevpc.net/",
-                context().getRemoteTheVpcSshUser()+"@"+context().getRemoteTheVpcSshHost().get()+":"+REMOTE_NUTS_THEVPC_DEPLOY_PATH
+                context().nutsRootFolder + "/scripts/thevpc.net/",
+                context().getRemoteTheVpcSshUser() + "@" + context().getRemoteTheVpcSshHost().get() + ":" + REMOTE_NUTS_THEVPC_DEPLOY_PATH
         ).run();
     }
 
@@ -94,14 +101,25 @@ public class SiteRunner extends AbstractRunner {
 
         vars.putAll(context().vars);
         vars.put("buildTime", new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date()));
-        {//stable
-            NAssert.requireNamedNonBlank(context().nutsLtsAppVersion, "nutsStableVersion");
-            NAssert.requireNamedNonBlank(context().nutsLtsApiVersion, "nutsApiStableVersion");
-            NAssert.requireNamedNonBlank(context().nutsLtsRuntimeVersion, "runtimeStableVersion");
+        {
+            List<NElement> children = NElementReader.ofTson().read(context().websiteProjectFolder.resolve("src/include/versions/versions.json"))
+                    .asArray().get().children();
 
-            NId stableApiId = NWorkspace.of().apiId().builder().version(context().nutsLtsApiVersion).build();
-            NId stableAppId = NWorkspace.of().appId().builder().version(context().nutsLtsAppVersion).build();
-            NId stableRuntimeId = NWorkspace.of().runtimeId().builder().version(context().nutsLtsRuntimeVersion).build();
+            String latestVersion = "v" + NWorkspace.of().apiId().version().toString();
+            List<String> allNonLatestVersions = children.stream().map(x -> x.asObject().get())
+                    .map(x->x.get("id").get().asStringValue().get())
+                    .filter(x->!x.equals(latestVersion))
+                    .collect(Collectors.toList());
+            vars.put("allNonLatestVersions", allNonLatestVersions);
+        }
+        {//stable
+            NAssert.requireNamedNonBlank(context().nutsStableAppVersion, "nutsStableAppVersion");
+            NAssert.requireNamedNonBlank(context().nutsStableApiVersion, "nutsStableApiVersion");
+            NAssert.requireNamedNonBlank(context().nutsStableRuntimeVersion, "nutsStableRuntimeVersion");
+
+            NId stableApiId = NWorkspace.of().apiId().builder().version(context().nutsStableApiVersion).build();
+            NId stableAppId = NWorkspace.of().appId().builder().version(context().nutsStableAppVersion).build();
+            NId stableRuntimeId = NWorkspace.of().runtimeId().builder().version(context().nutsStableRuntimeVersion).build();
 
             String stableJarLocation = "https://maven.thevpc.net/" + Mvn.jar(stableAppId);
 
@@ -152,6 +170,52 @@ public class SiteRunner extends AbstractRunner {
         return vars;
     }
 
+    private void prepareJars() {
+        NId latestAppId = NWorkspace.of().appId();
+        NId stableAppId = latestAppId.builder().version(context().nutsStableAppVersion).build();
+        NPath.of(Mvn.localMaven() + "/" + Mvn.jar(latestAppId))
+                .copyTo(context().websiteProjectFolder.resolve("src/resources/download/nuts-latest.jar")
+                );
+
+        context().websiteProjectFolder.resolve("src/resources/download/nuts-latest.jar").copyTo(
+                context().websiteProjectFolder.resolve("src/resources/download/nuts-app-" + latestAppId.version() + ".jar")
+        );
+
+
+        if (!context().websiteProjectFolder.resolve("src/resources/download/nuts-stable.jar").exists()) {
+            NPath.of("https://repo1.maven.org/maven2/" + Mvn.jar(stableAppId))
+                    .copyTo(context().websiteProjectFolder.resolve("src/resources/download/nuts-stable.jar")
+                    );
+        }
+        if (!context().websiteProjectFolder.resolve("src/resources/download/nuts-app-" + stableAppId.version() + ".jar").exists()) {
+            context().websiteProjectFolder.resolve("src/resources/download/nuts-stable.jar").copyTo(
+                    context().websiteProjectFolder.resolve("src/resources/download/nuts-app-" + stableAppId.version() + ".jar")
+            );
+        }
+    }
+
+    private void prepareVersions() {
+        echoC("**** %s %s (nuts)...", NMsg.ofStyledKeyword("prepare nsite versions"), NMsg.ofStyledSuccess("repository"));
+        List<NElement> children = NElementReader.ofTson().read(context().websiteProjectFolder.resolve("src/include/versions/versions.json"))
+                .asArray().get().children();
+        String latestVersion = "v" + NWorkspace.of().apiId().version().toString();
+        for (String version : children.stream().map(x -> x.asObject().get().get("id").get().asStringValue().get()).collect(Collectors.toList())) {
+            NPath vFolder = context().websiteProjectFolder.resolve("src/main/versions/" + version);
+            vFolder.ensureEmptyDirectory();
+            context().websiteProjectFolder.resolve("src/include/template/v1/doc-*.html")
+                    .walkGlob(NPathOption.SORTED)
+                    .forEach(x -> {
+                        String s2 = x.readString()
+                                .replace("[[templateLatestVersion]]", latestVersion)
+                                .replace("[[templateCurrentVersion]]", version)
+                                ;
+                        vFolder.resolve(x.name()).writeString(s2);
+                    });
+        }
+
+
+    }
+
     private void runGithubRepository() {
         echoC("**** %s %s (nuts)...", NMsg.ofStyledKeyword("nsite"), NMsg.ofStyledSuccess("repository"));
         NSiteProjectConfig config = new NSiteProjectConfig()
@@ -161,9 +225,6 @@ public class SiteRunner extends AbstractRunner {
                 .setTargetFolder(context().nutsRootFolder.toString());
         NSiteContext templateProject = new ProjectNSiteContext();
         templateProject.setVars(prepareVars());
-        NPath.of(Mvn.localMaven() + "/" + Mvn.jar(NWorkspace.of().appId()))
-                .copyTo(context().websiteProjectFolder.resolve("src/resources/download/nuts-standard.jar")
-                );
         templateProject.run(config);
     }
 
@@ -176,9 +237,6 @@ public class SiteRunner extends AbstractRunner {
                 .setTargetFolder(context().nutsRootFolder.resolve("docs").toString());
         NSiteContext templateProject = new ProjectNSiteContext();
         templateProject.setVars(prepareVars());
-        NPath.of(Mvn.localMaven() + "/" + Mvn.jar(NWorkspace.of().appId()))
-                .copyTo(context().websiteProjectFolder.resolve("src/resources/nuts-standard.jar")
-                );
         templateProject.run(config);
 
 
