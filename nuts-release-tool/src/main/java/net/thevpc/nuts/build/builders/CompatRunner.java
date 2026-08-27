@@ -136,15 +136,15 @@ public class CompatRunner extends AbstractRunner {
     private void generateCompatFile(Map<String, Double> compatMap) {
         echoV("**** $n $v...", NMaps.of("n", NMsg.ofStyledPrimary4("nuts"), "v", NMsg.ofStyledKeyword("build-compat-matrix")));
         NVersion[] allVersionsArray = allVersions.toArray(new NVersion[0]);
-        String title = "Nuts API Compatibility Matrix";
+        String title = "Pre-1.0 (0.8.x → 1.0.0) API Compatibility Matrix";
         NStringBuilder prefixText = new NStringBuilder()
                 .println("---")
                 .println("title: ${title}")
                 .println("---")
-                .println("A version-compatibility matrix is provided to help navigate API evolution across Nuts releases.")
-                .println("Each cell in the matrix links to a JAPI-Compliance-Checker report comparing version X to version Y, offering a detailed view of changes and compatibility levels between specific versions.")
-                .println("This makes it easy to assess upgrade paths and understand how APIs evolve over time.");
-        NPath file = context().websiteProjectFolder.resolve("src/include/doc-naf/01-introduction/120-versions.html.md");
+                .println("This compatibility matrix tracks the API evolution across the Pre-1.0 development series (from `0.8.0` up to `1.0.0`).")
+                .println("Each cell in the matrix links to a detailed JAPI-Compliance-Checker report comparing version X to version Y, offering an exact view of binary compatibility levels.")
+                .println("Green indicates 100% binary compatibility, while color gradations show the proportion of preserved API surface.");
+        NPath file = context().websiteProjectFolder.resolve("src/include/compatibility/01-overview/100-matrix.html.md");
 
         boolean showTitle = false;
         boolean htmlBodyOnly = true;
