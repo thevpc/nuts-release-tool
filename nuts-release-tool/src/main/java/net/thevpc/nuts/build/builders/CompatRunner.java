@@ -137,7 +137,7 @@ public class CompatRunner extends AbstractRunner {
         echoV("**** $n $v...", NMaps.of("n", NMsg.ofStyledPrimary4("nuts"), "v", NMsg.ofStyledKeyword("build-compat-matrix")));
         NVersion[] allVersionsArray = allVersions.toArray(new NVersion[0]);
         String title = "Pre-1.0 (0.8.x → 1.0.0) API Compatibility Matrix";
-        NStringBuilder prefixText = new NStringBuilder()
+        NStringBuilder prefixText = NStringBuilder.of()
                 .println("---")
                 .println("title: ${title}")
                 .println("---")
