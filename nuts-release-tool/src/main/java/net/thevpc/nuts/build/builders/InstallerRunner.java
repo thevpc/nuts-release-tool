@@ -54,9 +54,11 @@ public class InstallerRunner extends AbstractRunner {
 
     @Override
     public void configureAfterOptions() {
-        NUTS_JAVA_HOME.update(context()).ensureDirectory();
-        NUTS_INSTALLER_BUILD_JAVA_HOME.update(context()).ensureDirectory();
-        NUTS_GRAALVM_DIR.update(context()).ensureDirectory();
+        if(buildNative || buildJars) {
+            NUTS_JAVA_HOME.update(context()).ensureDirectory();
+            NUTS_INSTALLER_BUILD_JAVA_HOME.update(context()).ensureDirectory();
+            NUTS_GRAALVM_DIR.update(context()).ensureDirectory();
+        }
     }
 
     @Override
@@ -72,6 +74,9 @@ public class InstallerRunner extends AbstractRunner {
 
     @Override
     public void run() {
+        if(!buildJars && !buildNative) {
+            return;
+        }
         NativeBuilder r = new NativeBuilder();
         r.setJpackageHome(NUTS_INSTALLER_BUILD_JAVA_HOME.update(context()).ensureDirectory().getValue());
         r.setGraalvmHome(NUTS_GRAALVM_DIR.update(context()).ensureDirectory().getValue());
