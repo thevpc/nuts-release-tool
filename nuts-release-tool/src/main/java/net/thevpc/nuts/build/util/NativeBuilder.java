@@ -437,6 +437,72 @@ public class NativeBuilder {
         return Collections.singletonList(nexName);
     }
 
+    private List<NPath> createDistJPackageDEB(NPath rpmFile) {
+        echo("**** [$id] create $v (JPackage/FPM)...", NMaps.of("id", appId, "v", NMsg.ofStyledKeyword("deb")));
+        NPath debFile = dist.resolve(appName + "-linux64-deb-" + version + ".deb");
+        NPath targetFolder = dist.resolve(evalNameNoVersion(evalCurrentBinPlatform(), "deb", null));
+        if (targetFolder.isDirectory()) {
+            targetFolder.deleteTree();
+        }
+
+        boolean directSuccess = false;
+        try {
+            NExec.ofSystem()
+                    .command(jpackageHome + "/bin/jpackage")
+                    .command("--type", "deb")
+                    .command("--name", appName)
+                    .command("--description", displayName)
+                    .command("--vendor", vendor)
+                    .command("--app-version", version.toString())
+                    .command("--input", evalSrcDist().toString())
+                    .command("--main-jar", evalName(null, null, ".jar"))
+                    .command("--dest", targetFolder.toString())
+                    .failFast(true)
+                    .run();
+            NPath generatedDeb = targetFolder.list().stream().filter(x -> x.name().endsWith(".deb"))
+                    .findFirst().orElse(null);
+            if (generatedDeb != null) {
+                generatedDeb.copyTo(debFile);
+                directSuccess = true;
+            }
+        } catch (Exception ignored) {
+            // jpackage --type deb might fail if dpkg-deb is missing
+        } finally {
+            if (targetFolder.isDirectory()) {
+                targetFolder.deleteTree();
+            }
+        }
+
+        if (!directSuccess && rpmFile != null && rpmFile.exists()) {
+            try {
+                NPath fpmTargetFolder = dist.resolve("fpm-deb-build");
+                if (fpmTargetFolder.isDirectory()) {
+                    fpmTargetFolder.deleteTree();
+                }
+                fpmTargetFolder.mkdirs();
+                NExec.of().system()
+                        .directory(fpmTargetFolder)
+                        .command("fpm", "-s", "rpm", "-t", "deb", "--no-auto-depends", rpmFile.toAbsolute().toString())
+                        .failFast(true)
+                        .run();
+                NPath generatedDeb = fpmTargetFolder.list().stream().filter(x -> x.name().endsWith(".deb"))
+                        .findFirst().orElse(null);
+                if (generatedDeb != null) {
+                    generatedDeb.copyTo(debFile);
+                    directSuccess = true;
+                }
+                fpmTargetFolder.deleteTree();
+            } catch (Exception ex) {
+                echo("Failed to build DEB package via jpackage or fpm: " + ex.getMessage(), Collections.emptyMap());
+            }
+        }
+
+        if (debFile.exists()) {
+            return Collections.singletonList(debFile);
+        }
+        return Collections.emptyList();
+    }
+
     private List<NPath> createDistNativeJar2appAllBin() {
         List<NPath> ret = new ArrayList<>();
         ret.addAll(createDistNativeJar2app(BinPlatform.MAC64));
@@ -608,7 +674,10 @@ public class NativeBuilder {
             generatedFiles.addAll(createDistNativeGraalVMBin());
         }
         if (isSupported(PackageType.NATIVE)) {
-            generatedFiles.addAll(createDistJPackageRPM());
+            List<NPath> rpms = createDistJPackageRPM();
+            generatedFiles.addAll(rpms);
+            NPath rpmFile = rpms.isEmpty() ? null : rpms.get(0);
+            generatedFiles.addAll(createDistJPackageDEB(rpmFile));
         }
         if (isSupported(PackageType.JRE_BUNDLE)) {
             generatedFiles.addAll(createDistNativePackrAllWithJava());
