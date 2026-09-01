@@ -24,10 +24,13 @@ import net.thevpc.nuts.util.NAssert;
 import net.thevpc.nuts.text.NMsg;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -199,6 +202,7 @@ public class SiteRunner extends AbstractRunner {
         List<NElement> children = NElementReader.ofTson().read(context().websiteProjectFolder.resolve("src/include/versions/versions.json"))
                 .asArray().get().children();
         String latestVersion = "v" + NWorkspace.of().apiId().version().toString();
+        prepareCommandHelp(latestVersion);
         for (String version : children.stream().map(x -> x.asObject().get().get("id").get().asStringValue().get()).collect(Collectors.toList())) {
             NPath vFolder = context().websiteProjectFolder.resolve("src/main/versions/" + version);
             vFolder.ensureEmptyDirectory();
@@ -212,8 +216,55 @@ public class SiteRunner extends AbstractRunner {
                         vFolder.resolve(x.name()).writeString(s2);
                     });
         }
+    }
 
+    private void prepareCommandHelp(String latestVersion) {
+        NPath helpDir = context().websiteProjectFolder.resolve("src/include/versions/" + latestVersion + "/doc-nuts-help");
+        helpDir.mkdirs();
 
+        NPath folderInfo = helpDir.resolve(".folder-info.md");
+        if (!folderInfo.exists()) {
+            folderInfo.writeString("---\ntitle: Nuts Command Help\n---\nRaw command-line help syntax and options for Nuts commands.\n");
+        }
+
+        NPath runtimeFolder = context().nutsRootFolder.resolve("core/nuts-runtime/src/main/resources/net/thevpc/nuts/runtime");
+        NPath nutsHelp = runtimeFolder.resolve("nuts-help.ntf");
+        if (nutsHelp.exists()) {
+            String content = "---\nid: nuts-help\ntitle: nuts\n---\n\n" + nutsHelp.readString();
+            helpDir.resolve("010-nuts.ntf").writeString(content);
+        }
+
+        List<String> orderedCommands = Arrays.asList(
+                "exec", "which", "fetch", "install", "uninstall",
+                "check-updates", "update", "search", "deploy", "push",
+                "settings", "welcome", "info", "version", "help", "license", "bundle"
+        );
+
+        Set<String> processed = new HashSet<>();
+        int counter = 20;
+        for (String cmd : orderedCommands) {
+            NPath cmdFile = runtimeFolder.resolve("command/" + cmd + ".ntf");
+            if (cmdFile.exists()) {
+                String fileName = String.format("%03d-%s.ntf", counter, cmd);
+                String content = "---\nid: " + cmd + "-help\ntitle: " + cmd + "\n---\n\n" + cmdFile.readString();
+                helpDir.resolve(fileName).writeString(content);
+                processed.add(cmd + ".ntf");
+                counter += 10;
+            }
+        }
+
+        NPath commandFolder = runtimeFolder.resolve("command");
+        if (commandFolder.isDirectory()) {
+            for (NPath otherFile : commandFolder.stream().sorted().collect(Collectors.toList())) {
+                if (otherFile.name().endsWith(".ntf") && !processed.contains(otherFile.name())) {
+                    String cmd = otherFile.name().substring(0, otherFile.name().length() - 4);
+                    String fileName = String.format("%03d-%s.ntf", counter, cmd);
+                    String content = "---\nid: " + cmd + "-help\ntitle: " + cmd + "\n---\n\n" + otherFile.readString();
+                    helpDir.resolve(fileName).writeString(content);
+                    counter += 10;
+                }
+            }
+        }
     }
 
     private void runGithubRepository() {
