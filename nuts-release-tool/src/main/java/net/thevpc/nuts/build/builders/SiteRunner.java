@@ -19,6 +19,8 @@ import net.thevpc.nsite.context.NSiteContext;
 import net.thevpc.nsite.context.ProjectNSiteContext;
 import net.thevpc.nuts.collections.NMaps;
 import net.thevpc.nsite.NSiteProjectConfig;
+import net.thevpc.nsite.javadoc.NSiteJavadoc;
+import net.thevpc.nsite.javadoc.NSiteJavadocConfig;
 import net.thevpc.nuts.io.NPathOption;
 import net.thevpc.nuts.util.NAssert;
 import net.thevpc.nuts.text.NMsg;
@@ -203,6 +205,7 @@ public class SiteRunner extends AbstractRunner {
                 .asArray().get().children();
         String latestVersion = "v" + NWorkspace.of().apiId().version().toString();
         prepareCommandHelp(latestVersion);
+        prepareApiDoc(latestVersion);
         for (String version : children.stream().map(x -> x.asObject().get().get("id").get().asStringValue().get()).collect(Collectors.toList())) {
             NPath vFolder = context().websiteProjectFolder.resolve("src/main/versions/" + version);
             vFolder.ensureEmptyDirectory();
@@ -264,6 +267,25 @@ public class SiteRunner extends AbstractRunner {
                     counter += 10;
                 }
             }
+        }
+    }
+
+    private void prepareApiDoc(String latestVersion) {
+        NPath apiDir = context().websiteProjectFolder.resolve("src/include/versions/" + latestVersion + "/doc-api");
+        apiDir.mkdirs();
+        NPath apiSource = context().nutsRootFolder.resolve("core/nuts-api/src/main/java");
+        NPath bootSource = context().nutsRootFolder.resolve("core/nuts-boot/src/main/java");
+        if (apiSource.isDirectory()) {
+            echoC("**** %s %s (nuts)...", NMsg.ofStyledKeyword("generate javadoc"), NMsg.ofStyledSuccess("nuts-api"));
+            NSiteJavadocConfig config = new NSiteJavadocConfig()
+                    .addSourceRoot(apiSource.toString())
+                    .setTargetDir(apiDir.toString())
+                    .setTitle("Nuts Core API (Javadoc)")
+                    .setDescription("Comprehensive API reference for the Nuts Core API (nuts-api).");
+            if (bootSource.isDirectory()) {
+                config.addSourceRoot(bootSource.toString());
+            }
+            NSiteJavadoc.generate(config);
         }
     }
 
