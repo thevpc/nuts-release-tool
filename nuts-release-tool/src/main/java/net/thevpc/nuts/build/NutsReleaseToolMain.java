@@ -22,6 +22,7 @@ public class NutsReleaseToolMain  {
                 .runWith(() -> {
                     NutsReleaseToolRunner nutsBuildRunner = new NutsReleaseToolRunner(
                             new BaseConfRunner(),
+                            new MavenRunner(),
                             new JarsRunner(),
                             new ReposRunner(),
                             new InstallerRunner(),

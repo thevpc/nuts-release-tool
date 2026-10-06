@@ -118,8 +118,9 @@ public class SiteRunner extends AbstractRunner {
             vars.put("allNonLatestVersions", allNonLatestVersions);
         }
         {//stable
-            NAssert.requireNamedNonBlank(context().nutsStableAppVersion, "nutsStableAppVersion");
+            NAssert.requireNamedNonBlank(context().nutsStableBootVersion, "nutsStableBootVersion");
             NAssert.requireNamedNonBlank(context().nutsStableApiVersion, "nutsStableApiVersion");
+            NAssert.requireNamedNonBlank(context().nutsStableAppVersion, "nutsStableAppVersion");
             NAssert.requireNamedNonBlank(context().nutsStableRuntimeVersion, "nutsStableRuntimeVersion");
 
             NId stableApiId = NWorkspace.of().apiId().builder().version(context().nutsStableApiVersion).build();

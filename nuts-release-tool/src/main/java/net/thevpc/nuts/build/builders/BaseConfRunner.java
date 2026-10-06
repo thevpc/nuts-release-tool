@@ -122,9 +122,15 @@ public class BaseConfRunner extends AbstractRunner {
 
     @Override
     public void configureAfterOptions() {
+        NAssert.requireNamedNonBlank(context().nutsStableBootVersion, "nutsStableBootVersion");
         NAssert.requireNamedNonBlank(context().nutsStableApiVersion, "nutsStableApiVersion");
         NAssert.requireNamedNonBlank(context().nutsStableAppVersion, "nutsStableAppVersion");
         NAssert.requireNamedNonBlank(context().nutsStableRuntimeVersion, "nutsStableRuntimeVersion");
+
+        NAssert.requireNamedNonBlank(context().nutsLatestBootVersion, "nutsLatestBootVersion");
+        NAssert.requireNamedNonBlank(context().nutsLatestApiVersion, "nutsLatestApiVersion");
+        NAssert.requireNamedNonBlank(context().nutsLatestAppVersion, "nutsLatestAppVersion");
+        NAssert.requireNamedNonBlank(context().nutsLatestRuntimeVersion, "nutsLatestRuntimeVersion");
     }
 
     @Override

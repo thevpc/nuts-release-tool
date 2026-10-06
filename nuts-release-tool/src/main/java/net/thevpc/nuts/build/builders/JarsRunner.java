@@ -38,6 +38,10 @@ public class JarsRunner extends AbstractRunner {
                     productionMode = e.getValue().asBooleanValue().orElse(productionMode);
                     break;
                 }
+                case "stable-boot-version": {
+                    context().nutsStableBootVersion = e.getValue().asStringValue().orElse(context().nutsStableBootVersion);
+                    break;
+                }
                 case "stable-api-version": {
                     context().nutsStableApiVersion = e.getValue().asStringValue().orElse(context().nutsStableApiVersion);
                     break;
@@ -48,6 +52,22 @@ public class JarsRunner extends AbstractRunner {
                 }
                 case "stable-runtime-version": {
                     context().nutsStableRuntimeVersion = e.getValue().asStringValue().orElse(context().nutsStableRuntimeVersion);
+                    break;
+                }
+                case "latest-boot-version": {
+                    context().nutsLatestBootVersion = e.getValue().asStringValue().orElse(context().nutsLatestBootVersion);
+                    break;
+                }
+                case "latest-api-version": {
+                    context().nutsLatestApiVersion = e.getValue().asStringValue().orElse(context().nutsLatestApiVersion);
+                    break;
+                }
+                case "latest-app-version": {
+                    context().nutsLatestAppVersion = e.getValue().asStringValue().orElse(context().nutsLatestAppVersion);
+                    break;
+                }
+                case "latest-runtime-version": {
+                    context().nutsLatestRuntimeVersion = e.getValue().asStringValue().orElse(context().nutsLatestRuntimeVersion);
                     break;
                 }
             }

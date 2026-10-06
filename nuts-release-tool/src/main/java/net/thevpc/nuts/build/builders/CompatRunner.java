@@ -32,13 +32,50 @@ import java.util.regex.Pattern;
  */
 public class CompatRunner extends AbstractRunner {
 
-    TreeSet<NVersion> allVersions = new TreeSet<>();
     boolean buildCompat = false;
 
     public CompatRunner() {
         super();
     }
 
+    static class MatrixInfo {
+        String title;
+        TreeSet<NVersion> allVersions = new TreeSet<>();
+
+        public MatrixInfo(String title, String... allVersions) {
+            this.title = title;
+            this.allVersions = new TreeSet<>();
+            for (String allVersion : allVersions) {
+                this.allVersions.add(NVersion.of(allVersion));
+            }
+        }
+    }
+
+    private final MatrixInfo[] all = new MatrixInfo[]{
+            new MatrixInfo(
+                    "Versions 1.x",
+                    "1.0.0",
+                    "1.1.0"
+            ),
+            new MatrixInfo(
+                    "Versions 0.8.0...0.8.5",
+                    "0.8.0",
+                    "0.8.1",
+                    "0.8.2",
+                    "0.8.3",
+                    "0.8.4",
+                    "0.8.5"
+            ),
+            new MatrixInfo(
+                    "Versions 0.8.5...1.0.0",
+                    "0.8.5",
+                    "0.8.6",
+                    "0.8.7",
+                    "0.8.8",
+                    "0.8.9",
+                    "1.0.0"
+            ),
+    };
 
     @Override
     public void configureBeforeOptions(NCmdLine cmdLine) {
@@ -48,47 +85,7 @@ public class CompatRunner extends AbstractRunner {
                     buildCompat = e.getValue().asBooleanValue().orElse(buildCompat);
                     break;
                 }
-                case "all-versions": {
-                    if (e.getValue().isAnyString()) {
-                        for (String v : NStringUtils.split(e.getValue().asStringValue().get(), ",;", true, true)) {
-                            allVersions.add(NVersion.of(v));
-                        }
-                    } else if (e.getValue().isAnyArray()) {
-                        for (NElement child : e.getValue().asArray().get().children()) {
-                            if (child.isAnyString()) {
-                                for (String v : NStringUtils.split(child.asStringValue().get(), ",;", true, true)) {
-                                    allVersions.add(NVersion.of(v));
-                                }
-                            }
-                        }
-                    } else if (e.getValue().isAnyObject()) {
-                        for (NElement child : e.getValue().asArray().get().children()) {
-                            if (child.isAnyString()) {
-                                for (String v : NStringUtils.split(child.asStringValue().get(), ",;", true, true)) {
-                                    allVersions.add(NVersion.of(v));
-                                }
-                            }
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-        if (allVersions.isEmpty()) {
-            for (String v : new String[]{
-                    "0.8.0",
-                    "0.8.1",
-                    "0.8.2",
-                    "0.8.3",
-                    "0.8.4",
-                    "0.8.5",
-                    "0.8.6",
-                    "0.8.7",
-                    "0.8.8",
-                    "0.8.9",
-                    "1.0.0"
-            }) {
-                allVersions.add(NVersion.of(v));
+
             }
         }
     }
@@ -102,17 +99,21 @@ public class CompatRunner extends AbstractRunner {
     @Override
     public void run() {
         if (buildCompat) {
-            runCompat(false);
+            for (MatrixInfo matrixInfo : all) {
+                runCompat(matrixInfo, false);
+            }
         } else {
             if (context().buildSite) {
-                runCompat(true);
+                for (MatrixInfo matrixInfo : all) {
+                    runCompat(matrixInfo, true);
+                }
             }
         }
     }
 
-    private void runCompat(boolean readOnly) {
+    private void runCompat(MatrixInfo matrix, boolean readOnly) {
         echoV("**** $v (nuts)...", NMaps.of("v", NMsg.ofStyledKeyword("build-compat")));
-        NVersion[] allVersionsArray = allVersions.toArray(new NVersion[0]);
+        NVersion[] allVersionsArray = matrix.allVersions.toArray(new NVersion[0]);
         Map<String, Double> compatMap = new HashMap<>();
         for (int i = 0; i < allVersionsArray.length; i++) {
             for (int j = i + 1; j < allVersionsArray.length; j++) {
@@ -130,21 +131,21 @@ public class CompatRunner extends AbstractRunner {
                 );
             }
         }
-        generateCompatFile(compatMap);
+        generateCompatFile(matrix, compatMap);
     }
 
-    private void generateCompatFile(Map<String, Double> compatMap) {
+    private void generateCompatFile(MatrixInfo matrix, Map<String, Double> compatMap) {
         echoV("**** $n $v...", NMaps.of("n", NMsg.ofStyledPrimary4("nuts"), "v", NMsg.ofStyledKeyword("build-compat-matrix")));
-        NVersion[] allVersionsArray = allVersions.toArray(new NVersion[0]);
-        String title = "Pre-1.0 (0.8.x → 1.0.0) API Compatibility Matrix";
+        NVersion[] allVersionsArray = matrix.allVersions.toArray(new NVersion[0]);
+        String title = matrix.title;
         NStringBuilder prefixText = NStringBuilder.of()
                 .println("---")
                 .println("title: ${title}")
                 .println("---")
-                .println("This compatibility matrix tracks the API evolution across the Pre-1.0 development series (from `0.8.0` up to `1.0.0`).")
+                .println("This compatibility matrix tracks the API evolution across the Pre-1.0 development series (from `" + allVersionsArray[0] + "` up to `" + allVersionsArray[0] + "`).")
                 .println("Each cell in the matrix links to a detailed JAPI-Compliance-Checker report comparing version X to version Y, offering an exact view of binary compatibility levels.")
                 .println("Green indicates 100% binary compatibility, while color gradations show the proportion of preserved API surface.");
-        NPath file = context().websiteProjectFolder.resolve("src/include/compatibility/01-overview/100-matrix.html.md");
+        NPath file = context().websiteProjectFolder.resolve("src/include/compatibility/01-overview/100-matrix-" + allVersionsArray[0] + ".html.md");
 
         boolean showTitle = false;
         boolean htmlBodyOnly = true;
@@ -167,7 +168,7 @@ public class CompatRunner extends AbstractRunner {
                         "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no\">\n" +
                         "    <link href=\"assets/images/favicon.ico\" rel=\"icon\"/>\n" +
                         "    <title>" + title + "</title>\n" +
-                        "    <meta name=\"description\" content=\""+title+"\">\n" +
+                        "    <meta name=\"description\" content=\"" + title + "\">\n" +
                         "    <meta name=\"author\" content=\"thevpc\">\n" +
                         "    <!-- Bootstrap -->\n" +
                         "    <link rel=\"stylesheet\" type=\"text/css\" href=\"assets/vendor/bootstrap/css/bootstrap.min.css\"/>\n" +
@@ -230,7 +231,7 @@ public class CompatRunner extends AbstractRunner {
                         String urlPattern = embedIframes && linkToIFrames ?
                                 "#nuts_${i}_${j}"
                                 : "compat_reports/nuts/${i}_to_${j}/compat_report.html";
-                        out.println(NMsg.ofV("  <td style=\"background:" + bg + ";color:" + fg + "\"><a style=\"color:" + fg + ";text-decoration:none;\" href=\""+urlPattern+"\" target=\"_blank\">${i}→${j} ${comp}</a></td>", v -> {
+                        out.println(NMsg.ofV("  <td style=\"background:" + bg + ";color:" + fg + "\"><a style=\"color:" + fg + ";text-decoration:none;\" href=\"" + urlPattern + "\" target=\"_blank\">${i}→${j} ${comp}</a></td>", v -> {
                             switch (v) {
                                 case "i":
                                     return allVersionsArray[finalI].toString();
