@@ -1,2 +1,5 @@
 /nuts-release-tool/target
 /nuts-release-tool/dist
+
+# Maven build output
+target/

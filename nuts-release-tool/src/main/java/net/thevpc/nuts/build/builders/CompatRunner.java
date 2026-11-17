@@ -55,7 +55,7 @@ public class CompatRunner extends AbstractRunner {
             new MatrixInfo(
                     "Versions 1.x",
                     "1.0.0",
-                    "1.1.0"
+                    "1.2.0"
             ),
             new MatrixInfo(
                     "Versions 0.8.0...0.8.5",
